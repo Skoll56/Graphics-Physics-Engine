@@ -1,0 +1,5 @@
+﻿  DynamicObject.cpp
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\legacy\dynamicobject.cpp(64): warning C4018: '<': signed/unsigned mismatch
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\legacy\dynamicobject.cpp(176): warning C4552: '+': operator has no effect; expected operator with side-effect
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\legacy\dynamicobject.cpp(195): warning C4552: '+': operator has no effect; expected operator with side-effect
+  triangle.vcxproj -> D:\Users\Skoll\OneDrive - Bournemouth University\Work\Year 2\3D Graphics\triangle\legacy\Debug\triangle.exe
