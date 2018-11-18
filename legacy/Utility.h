@@ -1,20 +1,36 @@
 #include <glm/glm.hpp>
 #include <GLM/gtc/matrix_transform.hpp>
-#include "GameObject.h"
+#include "Shapes.h"
+#include "Shader.h"
+#include "Physics.h"
 
 namespace utility
 {
 	float distanceToPlane(glm::vec3 &n, glm::vec3 &p, glm::vec3 &q);
 
-	bool sphereToPlane(glm::vec3 &c0, glm::vec3 &c1, float r, glm::vec3 &ci, glm::vec3 &_permCP, GameObject *_plane);
+	
+	float* CrossProduct(float *a, float *b);
 
-	bool sphereToSphere(glm::vec3 &c0, glm::vec3 &c1, float r1, float r2, glm::vec3 &cp, glm::vec3 &sN);
+	bool sphereToPlane(Sphere *_my, Plane *_plane, glm::vec3 _c1);
+	bool sphereToSphere(Sphere *_my, Sphere *_sphere, glm::vec3 _c1);
+	
+	bool boxToSphere(Box *_my, Sphere *_sphere, glm::vec3 _c1);
 
-	bool boxToBox(GameObject *_box, glm::vec3 _pos, glm::vec3 _scale);
+	bool boxToBox(Box *_my, Box* _box, glm::vec3 _c1);
+	bool boxToPlane(Box *_my, Plane * _plane, glm::vec3 _c1);
+	
+
+	void update(GameObject* _obj, Shader* _shader, std::vector<GameObject*> _allObj, Physics *_physics, float _dT);
+
 
 	int coplanar_tri_tri(float N[3], float V0[3], float V1[3], float V2[3],
 		float U0[3], float U1[3], float U2[3]);
 
 	int NoDivTriTriIsect(float V0[3], float V1[3], float V2[3],
 		float U0[3], float U1[3], float U2[3]);
+
+	int triBoxOverlap(float boxcenter[3], 
+		       float boxhalfsize[3],float triverts[3][3]);
+
+	int planeBoxOverlap(float normal[3], float d, float maxbox[3]);
 }

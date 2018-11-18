@@ -1,3 +1,6 @@
+#ifndef _SHADER_H_
+#define _SHADER_H_
+
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
@@ -33,3 +36,4 @@ public:
 };
 
 
+#endif

@@ -23,6 +23,7 @@ public:
   VertexArray();
   VertexArray(std::string _path);
   VertexBuffer* getTriPos() { return m_buffers.at(0); }
+  VertexBuffer* getTriNorm() { return m_buffers.at(2); }
   void loadObj(std::string _path);
   void setBuffer(std::string _attribute, VertexBuffer *_buffer);
   int getVertexCount();

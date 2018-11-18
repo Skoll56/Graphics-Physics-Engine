@@ -6,7 +6,7 @@
 #include <time.h>
 #include <iostream>
 #include <fstream>
-
+#include "Utility.h"
 #include "VertexBuffer.h"
 #include "Shader.h"
 #include "VertexArray.h"
@@ -14,7 +14,7 @@
 #include "Texture.h"
 #include "Camera.h"
 #include "KinematicsObject.h"
-#include "DynamicObject.h"
+#include "Shapes.h"
 
 
 #define WINDOW_WIDTH 640
@@ -27,26 +27,31 @@ int main(int argc, char *argv[])
 {
 	SDL_Window *window = initialise();	
 
-	
+	Physics * physics = new Physics();
 	Shader *shader = new Shader();
-	Camera *camera = new Camera(glm::vec3(0, 0, 10), glm::vec3(0, 0, 0));
+	Camera *camera = new Camera(glm::vec3(0, 0, 30), glm::vec3(0, 0, 0));
 
 	std::vector<GameObject*> objects;
-	//DynamicObject *shape = new DynamicObject(glm::vec3(0,0,0), glm::vec3(1.0f, 1.0f, 1.0f), 20.0f, 0.0f, "Image1.bmp", "sphere", "player");
-	GameObject *floor = new GameObject(glm::vec3(0.0f, -20.0f, 0.0f), glm::vec3(5.0f, 1.0f, 5.0f), "diffuse.bmp", "plane", "floor");
-	GameObject *sphere = new GameObject(glm::vec3(1.0f, -10.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), "Image1.bmp", "box", "sphere");
-	DynamicObject *cat = new DynamicObject(glm::vec3(5.0f, 5.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 10.f, 0.2f, "curuthers_diffuse.png", "box", "cat");
+	//Spheres are size 1/1/1
+	//Boxes are size 1/1/1
+	//Planes are size 1/0/1
+	//Meshes may vary
 
-	//objects.push_back(shape);
+	// Constructor is: position/Scale/Mass/Bounciness/Unit size/Texture/Collider shape/unique tag
+
+	GameObject *shape = new Sphere(glm::vec3(0.0f, 15.0f, 0.0f), glm::vec3(2.5f, 2.5f, 2.5f), "image1.bmp");
+	GameObject *floor = new Plane(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(50.0f, 1.0f, 50.0f), glm::vec3(0.0f, 1.0f, 0.0f), "diffuse.bmp");
+	GameObject *sphere = new Sphere(glm::vec3(10.0f, 15.0f, 0.0f), glm::vec3(2.0f, 2.0f, 2.0f), "Image1.bmp");
+	sphere->addPhysics("ball", 2.0f, 0.3f);
+	GameObject *cat = new Mesh(glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(2.0f, 4.0f, 2.0f), "curuthers_diffuse.png", "curuthers.obj");
+	GameObject *box = new Box(glm::vec3(-10.0f, 5.0f, 4.0f), glm::vec3(2.0f, 2.0f, 2.0f), "Image2.png");
+
+	objects.push_back(shape);
 	objects.push_back(floor);
 	objects.push_back(sphere);
 	objects.push_back(cat);
+	objects.push_back(box);
 
-	//VAO
-	cat->m_vAO->loadObj("cube.obj");
-	//shape->m_vAO->loadObj("sphere.obj");
-	floor->m_vAO->loadObj("woodfloor.obj");
-	sphere->m_vAO->loadObj("cube.obj");
 
 	///VertexBuffer positions
 	//shape->m_vBOp->add(glm::vec3(0.0f, 0.5f, 0.0f));
@@ -69,9 +74,11 @@ int main(int argc, char *argv[])
 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
+	int i = 0;
 	
 	while(!quit) // Game Loop
 	{
+		i++;
 		// Re-initialise per-frame variables
 		float time = SDL_GetTicks();
 		float dTime = (time - t1) / 1000.0f;
@@ -104,16 +111,10 @@ int main(int argc, char *argv[])
 		///Objects
 
 
-		for (int i = 0; i < objects.size(); i++)
+		for (int o = 0; o < objects.size(); o++)
 		{
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, objects[i]->getPosition());
-			model = glm::scale(model, objects[i]->getScale());
-
-			shader->setUniform("in_Model", model); // Translate the model matrix by camera position and stuff	
-			shader->setUniform("in_Texture", objects[i]->m_tex);
-			shader->draw(objects[i]->m_vAO);
-			objects[i]->update(dTime, objects);
+			utility::update(objects[o], shader, objects, physics, dTime);
+			shader->draw(objects[o]->m_vAO);
 		}
 
 		
@@ -122,7 +123,7 @@ int main(int argc, char *argv[])
 		
 		
 		camera->update(dTime); // Update camera based on the input
-
+		if (i == 10) { i = 0; }
 		float targetTime = 1.0f / 60.f;
 		if (targetTime > dTime)
 		{

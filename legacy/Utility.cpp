@@ -1,89 +1,143 @@
 #include "Utility.h"
 #include <iostream>
 
+
 namespace utility
 {
+	
+	void update(GameObject* _obj, Shader* _shader, std::vector<GameObject*> _allObj, Physics *_physics, float _dT)
+	{
+		glm::mat4 modelMat = glm::mat4(1.0f);
+		modelMat = glm::translate(modelMat, _obj->getPosition());
+		modelMat = glm::scale(modelMat, _obj->getScale());
+		_obj->setModel(modelMat);
+		// < -- Rotate
+		
+		_shader->setUniform("in_Model", _obj->getModel()); // Translate the model matrix by camera position and stuff	
+		_shader->setUniform("in_Texture", _obj->m_tex);
+
+		if (_obj->isPhysics())
+		{
+			_physics->update(_obj, _allObj, _dT);
+		}
+
+	}
+	
+	float* CrossProduct(float *a, float *b) //Taken from somewhere
+	{
+		float Product[3];
+
+		//Cross product formula 
+		Product[0] = (a[1] * b[2]) - (a[2] * b[1]);
+		Product[1] = (a[2] * b[0]) - (a[0] * b[2]);
+		Product[2] = (a[0] * b[1]) - (a[1] * b[0]);
+
+		return Product;
+	}
+
 	float distanceToPlane(glm::vec3 & _n, glm::vec3 & _p, glm::vec3 & _q)
 	{
 
 		return glm::dot((_p-_q), _n);
 	}
 
-	bool sphereToPlane(glm::vec3 & _c0, glm::vec3 & _c1, float _r, glm::vec3 & _ci, glm::vec3 &_permCP, GameObject *_plane)
+	//Works except on boxes
+	bool sphereToPlane(Sphere *_my, Plane *_plane, glm::vec3 _c1)
 	{
 		glm::vec3 n = _plane->getNorm();
 		glm::vec3 q = _plane->getPosition();
-		float dis2Plane = distanceToPlane(n, _c0, q);
-		float dis2Plane2 = distanceToPlane(n, _c1, q);
-		
-		glm::vec3 rotScale = _plane->getScale() * _plane->getNorm() - 1.0f;
-		rotScale.x = fabs(rotScale.x);
-		rotScale.y = fabs(rotScale.y);
-		rotScale.z = fabs(rotScale.z);
+		glm::vec3 c0 = _my->getPosition();
+		glm::vec3 permCP = _my->m_rb->getPermCP();
+		glm::vec3 ci;
 
-		if (fabs(dis2Plane) <= _r) //If already colliding with the plane
+		float r = _my->getRadius();
+		float dis2Plane = distanceToPlane(n, c0, q);
+		float dis2Plane2 = distanceToPlane(n, _c1, q);		
+		glm::vec3 length = (_plane->getScale() / 2.0f);
+
+		if (fabs(dis2Plane) <= r) //If already colliding with the plane
 		{	
 			
-			if (fabs(_c0.x) > q.x + _plane->getScale().x * 5.0f || fabs(_c0.z) > q.z + _plane->getScale().z * 5.0f)
+			if (fabs(c0.x) > q.x + length.x || fabs(c0.z) > q.z + length.z) // If we fall off the plane
 			{
 				return false;
-			}
-			_ci.y = _permCP.y;  // This method only works for flat floors and ceilings. Need to find a way to alter this to only set the normal vector direction equal to the last to make it universal
-			_ci.x = _c0.x;
-			_ci.z = _c0.z;
-
+			}		
 			
+			glm::vec3 dif = c0 - permCP;
+			dif *= n;
+			ci = c0 - dif;
+			_my->m_rb->m_collisions.push_back(new Collision(ci, n));			
 			return true;
 		} 
 
 
-		if (fabs(dis2Plane) > _r && fabs(dis2Plane2) < _r) //If colliding with the plane during movement between two timesteps
+		else if (fabs(dis2Plane) > r && fabs(dis2Plane2) < r) //If colliding with the plane during movement between two timesteps
 		{
-			if (fabs(_c0.x) > q.x + _plane->getScale().x * 5.0f|| fabs(_c0.z) > q.z + _plane->getScale().z * 5.0f)
+			if (fabs(c0.x) > q.x + length.x || fabs(c0.z) > q.z + length.z) // If we fall off the plane
 			{
 				return false;
 			}			
 
-			float t = (dis2Plane - _r) / (dis2Plane - dis2Plane2);
-			_ci = (1.0f - t) * _c0 + t * _c1;
-			if (dis2Plane < 0.0f)
+			float t = (dis2Plane - r) / (dis2Plane - dis2Plane2);
+			ci = (1.0f - t) * c0 + t * _c1;
+			if (dis2Plane < 0.0f) // If under the plane
 			{
-				_ci *= -1.0f;
+				ci *= -1.0f;
 			}
-			_permCP = _ci;
-			std::cout << "<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+			_my->m_rb->setPermCP(ci);
+			_my->m_rb->m_collisions.push_back(new Collision(ci, n));
 			return true;
 
 		}
 
 		else { return false; }
 	}
+	
 
-	bool sphereToSphere(glm::vec3 & c0, glm::vec3 & c1, float r1, float r2, glm::vec3 & cp, glm::vec3 &sN)
+
+	//Works
+	bool sphereToSphere(Sphere *_my, Sphere *_sphere, glm::vec3 _c1)
 	{
+		glm::vec3 c0 = _my->getPosition();
+		glm::vec3 c1 = _sphere->getPosition();
+		float r1 = _my->getRadius();
+		float r2 = _sphere->getRadius();
 		float d = glm::length(c0 - c1);
 
-		if (d <= (r1 + r2))
+		if (d <= r1 + r2)
 		{
-			sN = glm::normalize(c0 - c1);
-			cp =  (r1 * sN) + (c1 + r2 * sN);
+			glm::vec3 sN = glm::normalize(c0 - c1);
+			glm::vec3 cp =  (r1 * sN) + (c1 + r2 * sN);
+			_my->m_rb->m_collisions.push_back(new Collision(cp, sN));
 			return true;
-
 		}
 		else { return false; }
 	}
 
-	bool boxToBox(GameObject * _box, glm::vec3 _pos, glm::vec3 _scale)
+	//Empty
+	bool boxToSphere(Box *_my, Sphere *_sphere, glm::vec3 _c1)
 	{
+
+	}
+
+	
+
+	bool boxToBox(Box *_my, Box* _box, glm::vec3 _c1)
+	{
+		
 		glm::vec3 otherP = _box->getPosition();
-		glm::vec3 otherS = _box->getScale();
-		if (_pos.x + _scale.x * 2.5f > otherP.x - otherS.x * 2.5f && _pos.x - _scale.x * 2.5f < otherP.x + otherS.x * 2.5f)
+		glm::vec3 pos = _my->getPosition();
+		glm::vec3 length = ((_my->getScale() / 2.0f) * _my->getSize());
+		glm::vec3 oLength = ((_box->getScale() / 2.0f) * _my->getSize());
+
+		if (pos.x + length.x >= otherP.x - oLength.x && pos.x - length.x <= otherP.x + oLength.x)
 		{
-			if (_pos.y + _scale.y * 2.5f > otherP.y - otherS.y * 2.5f && _pos.y - _scale.y * 2.5f < otherP.y + otherS.y * 2.5f)
+			if (pos.y + length.y >= otherP.y - oLength.y && pos.y - length.y <= otherP.y + oLength.y)
 			{
-				if (_pos.z + _scale.z * 2.5f > otherP.z - otherS.z * 2.5f && _pos.z - _scale.z * 2.5f < otherP.z + otherS.z * 2.5f)
+				if (pos.z + length.z >= otherP.z - oLength.z && pos.z - length.z <= otherP.z + oLength.z)
 				{
 					return true;
+					//Needs to find the normal, the CP and create the collision
 				}
 			}
 
@@ -91,6 +145,55 @@ namespace utility
 		return false;
 	}
 
+	//Works
+	bool boxToPlane(Box *_my, Plane * _plane, glm::vec3 _c1)
+	{
+		glm::vec3 c0 = _my->getPosition();
+		glm::vec3 n = _plane->getNorm();
+		glm::vec3 q = _plane->getPosition();
+		glm::vec3 scale = _my->getScale();
+		glm::vec3 ci;
+		float dis2Plane = distanceToPlane(n, c0, q);
+		float dis2Plane2 = distanceToPlane(n, _c1, q);
+		glm::vec3 edgePoint = c0 + scale / 2.0f;
+		float dEdge = glm::distance(edgePoint * n, c0 * n);
+		glm::vec3 length = _plane->getScale()/2.0f;
+
+		if (fabs(dis2Plane) <= dEdge) //If already colliding with the plane
+		{
+
+			if (fabs(c0.x - scale.x / 2.0f) > q.x + length.x || fabs(c0.z - scale.z / 2.0f) > q.z + length.z) // If we fall off the plane
+			{
+				return false;
+			}
+
+			glm::vec3 dif = c0 - _my->m_rb->getPermCP();
+			dif *= n;
+			ci = c0 - dif;
+			_my->m_rb->m_collisions.push_back(new Collision(ci, n));
+
+			return true;
+		}
+
+		if (fabs(dis2Plane) > dEdge && fabs(dis2Plane2) < dEdge) //If colliding with the plane during movement between two timesteps
+		{
+			if (fabs(c0.x - scale.x / 2.0f) > q.x + length.x || fabs(c0.z - scale.z / 2.0f) > q.z + length.z) // If we fall off the plane
+			{
+				return false;
+			}
+
+			float t = (dis2Plane - dEdge) / (dis2Plane - dis2Plane2);
+			ci = (1.0f - t) * c0 + t * _c1;
+			if (dis2Plane < 0.0f) // If under the plane
+			{
+				ci *= -1.0f;
+			}
+			_my->m_rb->setPermCP(ci);
+			_my->m_rb->m_collisions.push_back(new Collision(ci, n));
+			return true;
+		}
+		return false;
+	}
 
 
 
@@ -402,4 +505,194 @@ namespace utility
 		if (isect1[1]<isect2[0] || isect2[1]<isect1[0]) return 0;
 		return 1;
 	}
+
+
+
+
+	/********************************************************/
+/* AABB-triangle overlap test code                      */
+/* by Tomas Akenine-Möller                              */
+/* Function: int triBoxOverlap(float boxcenter[3],      */
+/*          float boxhalfsize[3],float triverts[3][3]); */
+/* History:                                             */
+/*   2001-03-05: released the code in its first version */
+/*   2001-06-18: changed the order of the tests, faster */
+/*                                                      */
+/* Acknowledgement: Many thanks to Pierre Terdiman for  */
+/* suggestions and discussions on how to optimize code. */
+/* Thanks to David Hunt for finding a ">="-bug!         */
+/********************************************************/
+#include <math.h>
+#include <stdio.h>
+
+#define X 0
+#define Y 1
+#define Z 2
+
+#define CROSS(dest,v1,v2) \
+          dest[0]=v1[1]*v2[2]-v1[2]*v2[1]; \
+          dest[1]=v1[2]*v2[0]-v1[0]*v2[2]; \
+          dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
+
+#define DOT(v1,v2) (v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2])
+
+#define SUB(dest,v1,v2) \
+          dest[0]=v1[0]-v2[0]; \
+          dest[1]=v1[1]-v2[1]; \
+          dest[2]=v1[2]-v2[2];
+
+#define FINDMINMAX(x0,x1,x2,min,max) \
+  min = max = x0;   \
+  if(x1<min) min=x1;\
+  if(x1>max) max=x1;\
+  if(x2<min) min=x2;\
+  if(x2>max) max=x2;
+
+	int planeBoxOverlap(float normal[3], float d, float maxbox[3])
+	{
+		int q;
+		float vmin[3], vmax[3];
+		for (q = X; q <= Z; q++)
+		{
+			if (normal[q] > 0.0f)
+			{
+				vmin[q] = -maxbox[q];
+				vmax[q] = maxbox[q];
+			}
+			else
+			{
+				vmin[q] = maxbox[q];
+				vmax[q] = -maxbox[q];
+			}
+		}
+		if (DOT(normal, vmin) + d > 0.0f) return 0;
+		if (DOT(normal, vmax) + d >= 0.0f) return 1;
+
+		return 0;
+	}
+
+
+	/*======================== X-tests ========================*/
+#define AXISTEST_X01(a, b, fa, fb)             \
+    p0 = a*v0[Y] - b*v0[Z];                    \
+    p2 = a*v2[Y] - b*v2[Z];                    \
+        if(p0<p2) {min=p0; max=p2;} else {min=p2; max=p0;} \
+    rad = fa * boxhalfsize[Y] + fb * boxhalfsize[Z];   \
+    if(min>rad || max<-rad) return 0;
+
+#define AXISTEST_X2(a, b, fa, fb)              \
+    p0 = a*v0[Y] - b*v0[Z];                    \
+    p1 = a*v1[Y] - b*v1[Z];                    \
+        if(p0<p1) {min=p0; max=p1;} else {min=p1; max=p0;} \
+    rad = fa * boxhalfsize[Y] + fb * boxhalfsize[Z];   \
+    if(min>rad || max<-rad) return 0;
+
+/*======================== Y-tests ========================*/
+#define AXISTEST_Y02(a, b, fa, fb)             \
+    p0 = -a*v0[X] + b*v0[Z];                   \
+    p2 = -a*v2[X] + b*v2[Z];                       \
+        if(p0<p2) {min=p0; max=p2;} else {min=p2; max=p0;} \
+    rad = fa * boxhalfsize[X] + fb * boxhalfsize[Z];   \
+    if(min>rad || max<-rad) return 0;
+
+#define AXISTEST_Y1(a, b, fa, fb)              \
+    p0 = -a*v0[X] + b*v0[Z];                   \
+    p1 = -a*v1[X] + b*v1[Z];                       \
+        if(p0<p1) {min=p0; max=p1;} else {min=p1; max=p0;} \
+    rad = fa * boxhalfsize[X] + fb * boxhalfsize[Z];   \
+    if(min>rad || max<-rad) return 0;
+
+/*======================== Z-tests ========================*/
+
+#define AXISTEST_Z12(a, b, fa, fb)             \
+    p1 = a*v1[X] - b*v1[Y];                    \
+    p2 = a*v2[X] - b*v2[Y];                    \
+        if(p2<p1) {min=p2; max=p1;} else {min=p1; max=p2;} \
+    rad = fa * boxhalfsize[X] + fb * boxhalfsize[Y];   \
+    if(min>rad || max<-rad) return 0;
+
+#define AXISTEST_Z0(a, b, fa, fb)              \
+    p0 = a*v0[X] - b*v0[Y];                \
+    p1 = a*v1[X] - b*v1[Y];                    \
+        if(p0<p1) {min=p0; max=p1;} else {min=p1; max=p0;} \
+    rad = fa * boxhalfsize[X] + fb * boxhalfsize[Y];   \
+    if(min>rad || max<-rad) return 0;
+
+	int triBoxOverlap(float boxcenter[3], float boxhalfsize[3], float triverts[3][3])
+	{
+
+		/*    use separating axis theorem to test overlap between triangle and box */
+		/*    need to test for overlap in these directions: */
+		/*    1) the {x,y,z}-directions (actually, since we use the AABB of the triangle */
+		/*       we do not even need to test these) */
+		/*    2) normal of the triangle */
+		/*    3) crossproduct(edge from tri, {x,y,z}-directin) */
+		/*       this gives 3x3=9 more tests */
+		float v0[3], v1[3], v2[3];
+		float min, max, d, p0, p1, p2, rad, fex, fey, fez;
+		float normal[3], e0[3], e1[3], e2[3];
+
+		/* This is the fastest branch on Sun */
+		/* move everything so that the boxcenter is in (0,0,0) */
+		SUB(v0, triverts[0], boxcenter);
+		SUB(v1, triverts[1], boxcenter);
+		SUB(v2, triverts[2], boxcenter);
+
+		/* compute triangle edges */
+		SUB(e0, v1, v0);      /* tri edge 0 */
+		SUB(e1, v2, v1);      /* tri edge 1 */
+		SUB(e2, v0, v2);      /* tri edge 2 */
+
+		/* Bullet 3:  */
+		/*  test the 9 tests first (this was faster) */
+		fex = fabs(e0[X]);
+		fey = fabs(e0[Y]);
+		fez = fabs(e0[Z]);
+		AXISTEST_X01(e0[Z], e0[Y], fez, fey);
+		AXISTEST_Y02(e0[Z], e0[X], fez, fex);
+		AXISTEST_Z12(e0[Y], e0[X], fey, fex);
+
+		fex = fabs(e1[X]);
+		fey = fabs(e1[Y]);
+		fez = fabs(e1[Z]);
+		AXISTEST_X01(e1[Z], e1[Y], fez, fey);
+		AXISTEST_Y02(e1[Z], e1[X], fez, fex);
+		AXISTEST_Z0(e1[Y], e1[X], fey, fex);
+
+		fex = fabs(e2[X]);
+		fey = fabs(e2[Y]);
+		fez = fabs(e2[Z]);
+		AXISTEST_X2(e2[Z], e2[Y], fez, fey);
+		AXISTEST_Y1(e2[Z], e2[X], fez, fex);
+		AXISTEST_Z12(e2[Y], e2[X], fey, fex);
+
+		/* Bullet 1: */
+		/*  first test overlap in the {x,y,z}-directions */
+		/*  find min, max of the triangle each direction, and test for overlap in */
+		/*  that direction -- this is equivalent to testing a minimal AABB around */
+		/*  the triangle against the AABB */
+
+		/* test in X-direction */
+		FINDMINMAX(v0[X], v1[X], v2[X], min, max);
+		if (min > boxhalfsize[X] || max < -boxhalfsize[X]) return 0;
+
+		/* test in Y-direction */
+		FINDMINMAX(v0[Y], v1[Y], v2[Y], min, max);
+		if (min > boxhalfsize[Y] || max < -boxhalfsize[Y]) return 0;
+
+		/* test in Z-direction */
+		FINDMINMAX(v0[Z], v1[Z], v2[Z], min, max);
+		if (min > boxhalfsize[Z] || max < -boxhalfsize[Z]) return 0;
+
+		/* Bullet 2: */
+		/*  test if the box intersects the plane of the triangle */
+		/*  compute plane equation of triangle: normal*x+d=0 */
+		CROSS(normal, e0, e1);
+		d = -DOT(normal, v0);  /* plane eq: normal.x+d=0 */
+		if (!planeBoxOverlap(normal, d, boxhalfsize)) return 0;
+
+		return 1;   /* box and triangle overlaps */
+	}
+
+
 }

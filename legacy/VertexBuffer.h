@@ -14,6 +14,7 @@ private:
 	std::vector <GLfloat> m_data;
 	bool m_dirty;
 
+
 public:
 	VertexBuffer();
 	float getData(int i) { return m_data[i]; }
