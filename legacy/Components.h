@@ -17,6 +17,82 @@ class Component
 
 };
 
+
+class Shape : public Component
+{
+public:
+	bool isSolid() { return m_solid; }
+	void setSolid(bool _solid) { m_solid = _solid; }
+	glm::vec3 getSize() { return m_size; }
+
+	void setScale(float _sX, float _sY, float _sZ) { m_scale.x = _sX; m_scale.y = _sY; m_scale.z = _sZ; }
+	glm::vec3 getScale() { return m_scale; }
+	float getMass() { return m_mass; }
+
+	void setRotation(float _rotX, float _rotY, float _rotZ) { m_rotation.x = _rotX; m_rotation.y = _rotY; m_rotation.z = _rotZ; }
+	glm::mat4 getModel() { return m_model; }
+	void setModel(glm::mat4 _model) { m_model = _model; }
+
+protected:
+	VertexArray * m_vAO; // The shape's mesh/obj
+	VertexBuffer *m_vBOt; // The vertex buffer for texture co-ordinates
+	VertexBuffer *m_vBOp; // The vertex buffer for object co-ordinates
+	Texture *m_tex;
+	glm::mat4 m_model;
+	bool m_solid;
+	float m_mass;
+	glm::vec3 m_rotation;
+	glm::vec3 m_size;
+	glm::vec3 m_scale;
+};
+
+
+class Sphere : public Shape
+{
+public:
+	Sphere(std::string _texName, glm::vec3 _scale);
+	float getRadius() { return m_radius; }
+
+private:
+	float m_radius;
+
+};
+
+
+
+class Plane : public Shape
+{
+public:
+	Plane(std::string _texName, glm::vec3 _scale, glm::vec3 _normal);
+	glm::vec3 getNorm() { return m_normal; }
+	void setNorm(glm::vec3 _norm) { m_normal = _norm; }
+	
+private:
+	glm::vec3 m_normal;
+};
+
+
+class Box : public Shape
+{
+public:
+	Box(std::string _texName, glm::vec3 _scale);
+
+private:
+	std::vector<Plane> m_face;
+};
+
+
+class Mesh : public Shape
+{
+public:
+	Mesh(std::string _texName, std::string _obj, glm::vec3 _scale, glm::vec3 _size);
+
+private:
+
+};
+
+
+
 class PhysicsObj : public Component
 {
 public:
@@ -27,15 +103,10 @@ public:
 	glm::vec3 rungeKutta2(float _deltaTs, float _mass);
 	void rungeKutta4(float _deltaTs);
 
-	void setForce(const glm::vec3 _force) {
-		m_force = _force;
-	}
-	void setMass(float _mass) { m_mass = _mass; }
-	float getMass() const { return m_mass; }
+	void setForce(const glm::vec3 _force) {	m_force = _force;}
 	glm::vec3 getVelocity() { return m_velocity; }
 	void setVelocity(const glm::vec3 _vel) { m_velocity = _vel; }
 	float getBounciness() { return m_bounciness; }
-
 	const glm::vec3 getForce() const { return m_force; }
 
 
@@ -49,14 +120,11 @@ public:
 	void startSimulation(bool _start) { m_start = _start; }
 
 private:
-
 	glm::vec3 m_permCP;
 	float m_bounciness;
+	glm::vec3 m_velocity;
 	glm::vec3 m_force;
 	bool m_collided;
-	glm::vec3 m_velocity;
-
-	float m_mass;
 	float m_resist;
 	bool m_start;
 };

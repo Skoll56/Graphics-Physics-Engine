@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 {
 	SDL_Window *window = initialise();	
 
-	Physics * physics = new Physics();
+	Physics * physics = new Physics(-9.81f);
 	Shader *shader = new Shader();
 	Camera *camera = new Camera(glm::vec3(0, 0, 30), glm::vec3(0, 0, 0));
 

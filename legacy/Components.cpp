@@ -29,3 +29,14 @@ void PhysicsObj::resetCollisions()
 	m_collisions.clear();
 	m_collided = false;
 }
+
+Box::Box(std::string _texName)
+{
+	m_vBOp = new VertexBuffer();
+	m_vBOt = new VertexBuffer();
+	m_vAO = new VertexArray();
+	m_tex = new Texture();
+	m_size = glm::vec3(1.0f, 1.0f, 1.0f);
+	m_mass = INFINITY;
+	m_solid = true;
+}
