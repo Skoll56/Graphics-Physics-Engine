@@ -1,3 +1,159 @@
-﻿  Physics.cpp
-d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\physics.cpp(15): warning C4018: '<': signed/unsigned mismatch
-  triangle.vcxproj -> D:\Users\Skoll\OneDrive - Bournemouth University\Work\Year 2\3D Graphics\triangle\Graphics-Physics-Engine\legacy\Debug\triangle.exe
+﻿  main.cpp
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\collision.h(9): error C2061: syntax error: identifier 'GameObject'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\main.cpp(91): warning C4244: 'initializing': conversion from 'Uint32' to 'float', possible loss of data
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\main.cpp(93): warning C4244: '=': conversion from 'float' to 'long', possible loss of data
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\main.cpp(116): warning C4018: '<': signed/unsigned mismatch
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\main.cpp(125): warning C4018: '<': signed/unsigned mismatch
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\main.cpp(148): warning C4244: 'argument': conversion from 'float' to 'Uint32', possible loss of data
+  Utility.cpp
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\collision.h(9): error C2061: syntax error: identifier 'GameObject'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\utility.cpp(73): error C2661: 'Collision::Collision': no overloaded function takes 4 arguments
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\utility.cpp(92): error C2661: 'Collision::Collision': no overloaded function takes 4 arguments
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\utility.cpp(115): error C2661: 'Collision::Collision': no overloaded function takes 4 arguments
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\utility.cpp(177): error C2661: 'Collision::Collision': no overloaded function takes 4 arguments
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\utility.cpp(196): error C2661: 'Collision::Collision': no overloaded function takes 4 arguments
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\utility.cpp(539): warning C4005: 'CROSS': macro redefinition
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\utility.cpp(236): note: see previous definition of 'CROSS'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\utility.cpp(546): warning C4005: 'SUB': macro redefinition
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\utility.cpp(243): note: see previous definition of 'SUB'
+  Physics.cpp
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\collision.h(9): error C2061: syntax error: identifier 'GameObject'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\utility.h(26): error C2061: syntax error: identifier 'Physics'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\physics.cpp(18): warning C4018: '<': signed/unsigned mismatch
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\physics.cpp(118): warning C4018: '<': signed/unsigned mismatch
+  GameObject.cpp
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\collision.h(9): error C2061: syntax error: identifier 'GameObject'
+  Components.cpp
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(126): error C2065: 'Collision': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(126): error C2059: syntax error: '>'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(126): error C2976: 'std::vector': too few template arguments
+  d:\program files (x86)\microsoft visual studio\2017\community2\vc\tools\msvc\14.12.25827\include\vector(658): note: see declaration of 'std::vector'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(12): error C2011: 'Component': 'class' type redefinition
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(12): note: see declaration of 'Component'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(18): error C2011: 'Shape': 'class' type redefinition
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(18): note: see declaration of 'Shape'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(51): error C2011: 'Sphere': 'class' type redefinition
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(51): note: see declaration of 'Sphere'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(65): error C2011: 'Plane': 'class' type redefinition
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(65): note: see declaration of 'Plane'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(77): error C2011: 'Box': 'class' type redefinition
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(77): note: see declaration of 'Box'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(87): error C2011: 'Mesh': 'class' type redefinition
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(87): note: see declaration of 'Mesh'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(98): error C2011: 'PhysicsObj': 'class' type redefinition
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(98): note: see declaration of 'PhysicsObj'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(3): error C2027: use of undefined type 'PhysicsObj'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(98): note: see declaration of 'PhysicsObj'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(4): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(5): error C2065: 'm_mass': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(6): error C2065: 'm_bounciness': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(7): warning C4508: '{ctor}': function should return a value; 'void' return type assumed
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(9): error C2027: use of undefined type 'PhysicsObj'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(98): note: see declaration of 'PhysicsObj'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(10): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(11): error C2065: 'm_mass': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(12): error C2065: 'm_bounciness': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(13): warning C4508: '{ctor}': function should return a value; 'void' return type assumed
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(15): error C2027: use of undefined type 'PhysicsObj'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(98): note: see declaration of 'PhysicsObj'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(17): error C2065: 'm_force': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(20): error C2065: 'm_velocity': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(21): error C2065: 'm_velocity': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(27): error C2027: use of undefined type 'PhysicsObj'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(98): note: see declaration of 'PhysicsObj'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(29): error C2065: 'm_collisions': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(29): error C2228: left of '.clear' must have class/struct/union
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(29): note: type is 'unknown-type'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(30): error C2065: 'm_collided': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(33): error C2027: use of undefined type 'Box'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(77): note: see declaration of 'Box'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(34): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(35): error C2065: 'm_vBOp': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(36): error C2065: 'm_vBOt': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(37): error C2065: 'm_vAO': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(38): error C2065: 'm_tex': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(39): error C2065: 'm_rotation': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(40): error C2065: 'm_size': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(41): error C2065: 'm_scale': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(42): error C2065: 'm_solid': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(43): error C2065: 'm_tex': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(43): error C2227: left of '->addTexture' must point to class/struct/union/generic type
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(43): note: type is 'unknown-type'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(44): error C2065: 'm_vAO': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(44): error C2227: left of '->loadObj' must point to class/struct/union/generic type
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(44): note: type is 'unknown-type'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(45): warning C4508: '{ctor}': function should return a value; 'void' return type assumed
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(47): error C2027: use of undefined type 'Plane'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(65): note: see declaration of 'Plane'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(48): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(49): error C2065: 'm_vBOp': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(50): error C2065: 'm_vBOt': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(51): error C2065: 'm_vAO': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(52): error C2065: 'm_tex': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(53): error C2065: 'm_rotation': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(54): error C2065: 'm_scale': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(55): error C2065: 'm_tex': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(55): error C2227: left of '->addTexture' must point to class/struct/union/generic type
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(55): note: type is 'unknown-type'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(56): error C2065: 'm_size': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(57): error C2065: 'm_mass': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(58): error C2065: 'm_solid': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(59): error C2065: 'm_normal': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(60): error C2065: 'm_vAO': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(60): error C2227: left of '->loadObj' must point to class/struct/union/generic type
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(60): note: type is 'unknown-type'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(61): error C2065: 'm_tex': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(61): error C2227: left of '->addTexture' must point to class/struct/union/generic type
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(61): note: type is 'unknown-type'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(64): warning C4508: '{ctor}': function should return a value; 'void' return type assumed
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(66): error C2027: use of undefined type 'Sphere'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(51): note: see declaration of 'Sphere'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(67): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(68): error C2065: 'm_vBOp': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(69): error C2065: 'm_vBOt': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(70): error C2065: 'm_vAO': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(71): error C2065: 'm_tex': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(72): error C2065: 'm_rotation': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(73): error C2065: 'm_scale': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(74): error C2065: 'm_tex': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(74): error C2227: left of '->addTexture' must point to class/struct/union/generic type
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(74): note: type is 'unknown-type'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(75): error C2065: 'm_size': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(76): error C2065: 'm_mass': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(77): error C2065: 'm_solid': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(78): error C2065: 'm_radius': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(79): error C2065: 'm_vAO': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(79): error C2227: left of '->loadObj' must point to class/struct/union/generic type
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(79): note: type is 'unknown-type'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(80): error C2065: 'm_tex': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(80): error C2227: left of '->addTexture' must point to class/struct/union/generic type
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(80): note: type is 'unknown-type'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(82): warning C4508: '{ctor}': function should return a value; 'void' return type assumed
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(84): error C2027: use of undefined type 'Mesh'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(87): note: see declaration of 'Mesh'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(85): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(86): error C2065: 'm_vBOp': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(87): error C2065: 'm_vBOt': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(88): error C2065: 'm_vAO': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(89): error C2065: 'm_tex': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(90): error C2065: 'm_rotation': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(91): error C2065: 'm_scale': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(92): error C2065: 'm_tex': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(92): error C2227: left of '->addTexture' must point to class/struct/union/generic type
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(92): note: type is 'unknown-type'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(93): error C2065: 'm_size': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(94): error C2065: 'm_mass': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(95): error C2065: 'm_solid': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(96): error C2065: 'm_vAO': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(96): error C2227: left of '->loadObj' must point to class/struct/union/generic type
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(96): note: type is 'unknown-type'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(97): error C2065: 'm_tex': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(97): error C2227: left of '->addTexture' must point to class/struct/union/generic type
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(97): note: type is 'unknown-type'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.cpp(99): warning C4508: '{ctor}': function should return a value; 'void' return type assumed
+  Collision.cpp
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(126): error C2065: 'Collision': undeclared identifier
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(126): error C2059: syntax error: '>'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\graphics-physics-engine\legacy\components.h(126): error C2976: 'std::vector': too few template arguments
+  d:\program files (x86)\microsoft visual studio\2017\community2\vc\tools\msvc\14.12.25827\include\vector(658): note: see declaration of 'std::vector'
+  Generating Code...

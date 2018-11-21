@@ -1,10 +1,6 @@
 #ifndef __GAME_OBJECT__
 #define __GAME_OBJECT__
 
-
-#include "VertexArray.h"
-#include "VertexBuffer.h"
-#include "Texture.h"
 #include "Components.h"
 
 
@@ -31,32 +27,38 @@ public:
 	void setActive(bool _status) { m_active = _status; }
 
 	
-	//Components
-
+	//Component functions
 	void addPlaneShape(std::string _texName, glm::vec3 _scale, glm::vec3 _normal);
 	void addBoxShape(std::string _texName, glm::vec3 _scale);    
 	void addSphereShape(std::string _texName, float _radius);
+	void addMeshShape(std::string _texName, std::string _obj, glm::vec3 _scale, glm::vec3 _size);
+	void deleteShape();
 
 	void addPhysics(std::string _tag, float _mass, float _bounciness); // Adds a rigidbody
 	void removePhysics();
 	bool isPhysics() { return m_physics; } // A boolean that holds if it is a physics object or not
-	std::string getType() { return m_type; } // Type = shape (ie: box, sphere, etc)
+	std::string getShape() { return m_shape; } // shape (ie: box, sphere, etc)
 
+
+
+
+	//Component variables
 	PhysicsObj *m_rb;
-	Shape *m_shape;
+	Plane *m_plane;
+	Sphere *m_sphere;
+	Box *m_box;
+	Mesh *m_mesh;
+	Shape *m_shapeComp;
 
-protected:	
+protected:		
 	
-	
-	std::string m_type;	
-	glm::vec3 m_position;
-	bool m_physics;
-	
-	
-	std::string m_tag;
-	
-	
+	glm::vec3 m_position;	
+	std::string m_tag;	
 	bool m_active;
+
+	//Component Variables
+	std::string m_shape;	
+	bool m_physics;	
 };
 
 #endif

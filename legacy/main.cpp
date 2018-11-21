@@ -13,8 +13,6 @@
 #include "stb_image.h"
 #include "Texture.h"
 #include "Camera.h"
-#include "KinematicsObject.h"
-#include "Shapes.h"
 
 
 #define WINDOW_WIDTH 640
@@ -35,16 +33,26 @@ int main(int argc, char *argv[])
 	//Spheres are size 1/1/1
 	//Boxes are size 1/1/1
 	//Planes are size 1/0/1
-	//Meshes may vary
+	//Meshes may vary. Mesh sizes are used to determine their hitbox (box collisions are always tested before the mesh collision for efficiency)
 
-	// Constructor is: position/Scale/Mass/Bounciness/Unit size/Texture/Collider shape/unique tag
 
-	GameObject *shape = new Sphere(glm::vec3(0.0f, 15.0f, 0.0f), glm::vec3(2.5f, 2.5f, 2.5f), "image1.bmp");
-	GameObject *floor = new Plane(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(50.0f, 1.0f, 50.0f), glm::vec3(0.0f, 1.0f, 0.0f), "diffuse.bmp");
-	GameObject *sphere = new Sphere(glm::vec3(10.0f, 15.0f, 0.0f), glm::vec3(2.0f, 2.0f, 2.0f), "Image1.bmp");
+	GameObject *shape = new GameObject(glm::vec3(0.0f, 15.0f, 0.0f));
+	shape->addSphereShape("image1.bmp", 5.0f);
+	shape->addPhysics("testShape", 20.0f, 0.3f);
+
+	GameObject *floor = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f));
+	floor->addPlaneShape("diffuse.bmp", glm::vec3(50.0f, 1.0f, 50.f), glm::vec3(0.0f, 1.0f, 0.0f ));	
+
+	GameObject *sphere = new GameObject(glm::vec3(10.0f, 15.0f, 0.0f));
+	sphere->addSphereShape("Image1.bmp", 2.0f);
 	sphere->addPhysics("ball", 2.0f, 0.3f);
-	GameObject *cat = new Mesh(glm::vec3(0.0f, 5.0f, 5.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(2.0f, 4.0f, 2.0f), "curuthers_diffuse.png", "curuthers.obj");
-	GameObject *box = new Box(glm::vec3(-10.0f, 5.0f, 4.0f), glm::vec3(2.0f, 2.0f, 2.0f), "Image2.png");
+
+	//Curuthers has a size of (roughly) 2/4/2. 
+	GameObject *cat = new GameObject(glm::vec3(0.0f, 5.0f, 5.0f));
+	cat->addMeshShape("curuthers_diffuse.png", "curuthers.obj", glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(2.0f, 4.0f, 2.0f));
+
+	GameObject *box = new GameObject(glm::vec3(-10.0f, 5.0f, 4.0f));
+	box->addBoxShape("Image2.png", glm::vec3(2.0f, 2.0f, 2.0f));
 
 	objects.push_back(shape);
 	objects.push_back(floor);
@@ -74,11 +82,11 @@ int main(int argc, char *argv[])
 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
-	int i = 0;
+	
 	
 	while(!quit) // Game Loop
 	{
-		i++;
+		
 		// Re-initialise per-frame variables
 		float time = SDL_GetTicks();
 		float dTime = (time - t1) / 1000.0f;
@@ -96,11 +104,7 @@ int main(int argc, char *argv[])
 		//Set the active texture buffer
 		glActiveTexture(GL_TEXTURE0 + 1);
 
-		//Bind the texture to the buffer and set its uniform
 		
-
-		
-
 		///Camera				
 		shader->setUniform("in_Projection", glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f)); //Set the projection uniform
 		glm::mat4 model(1.0f);		
@@ -109,13 +113,26 @@ int main(int argc, char *argv[])
 		shader->setUniform("in_View", glm::inverse(model)); // Establish the view matrix		
 		
 		///Objects
-
+		for (int o = 0; o < objects.size(); o++) // Check every object
+		{
+			if (objects[o]->getShape() != "NO SHAPE") // Don't bother updating objects with no collider or mesh
+			{
+				utility::update(objects[o], shader, objects, physics, dTime); // Update the object's model matrix and appearance, and its physical location
+				shader->draw(objects[o]->m_shapeComp->m_vAO); // Draw the object to the screen
+			}
+		}
 
 		for (int o = 0; o < objects.size(); o++)
 		{
-			utility::update(objects[o], shader, objects, physics, dTime);
-			shader->draw(objects[o]->m_vAO);
+			if (objects[o]->isPhysics())
+			{
+				if (objects[o]->m_rb->collided()) // Checks for any objects that collided during their update earlier
+				{
+					physics->handleCollisions(objects[o]); // Handles collision responses 
+				}
+			}
 		}
+
 
 		
 		SDL_GL_SwapWindow(window);
@@ -123,7 +140,8 @@ int main(int argc, char *argv[])
 		
 		
 		camera->update(dTime); // Update camera based on the input
-		if (i == 10) { i = 0; }
+		
+
 		float targetTime = 1.0f / 60.f;
 		if (targetTime > dTime)
 		{

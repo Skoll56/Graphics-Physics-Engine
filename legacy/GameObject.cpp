@@ -1,5 +1,4 @@
-#include <GLM/gtc/type_ptr.hpp>
-#include <GLM/gtc/matrix_transform.hpp>
+
 #include "GameObject.h"
 
 /*! \brief Brief description.
@@ -12,88 +11,67 @@
 GameObject::GameObject(glm::vec3 _startPos)
 {	
 	m_position = _startPos;	
-	m_mass = INFINITY;
-	m_solid = true;
-	m_active = true;
-	m_velocity = glm::vec3(0.0f, 0.0f, 0.0f);
-	m_tag = "NO TAG";
+	m_tag = "untagged";
+	m_shape = "NO SHAPE";
+
 }
 
-/*(GameObject::GameObject(glm::vec3 _startPos, glm::vec3 _scale, glm::vec3 _normal, int _i)
-{
-	float offset = 0.0f;
-	glm::vec3 hScale = (_scale / 2.0f) + offset;
-	m_position = _startPos;
-	m_scale = _scale;
-	m_normal = _normal;
-	m_type = "face";
-
-	if (_i == 0)
-	{
-		m_position.y += hScale.y; //Top
-		m_normal = glm::vec3(0.0f, 1.0f, 0.0f);
-		m_scale.y = 0.0f;
-	}
-
-	else if (_i == 1)
-	{
-		m_position.y -= hScale.y; //Bottom
-		m_normal = glm::vec3(0.0f, 1.0f, 0.0f);
-		m_scale.y = 0.0f;
-		
-	}
-
-	else if (_i == 2)
-	{
-		m_position.x -= hScale.x; //Left
-		m_normal = glm::vec3(1.0f, 0.0f, 0.0f);
-		m_scale.x = 0.0f;
-	}
-
-	else if (_i == 3)
-	{
-		m_position.x += hScale.x; //Right
-		m_normal = glm::vec3(1.0f, 0.0f, 0.0f);
-		m_scale.x = 0.0f;
-	}
-
-	else if (_i == 4)
-	{
-		m_position.z -= hScale.z; //Towards
-		m_normal = glm::vec3(0.0f, 0.0f, 1.0f);
-		m_scale.z = 0.0f;
-	}
-
-	else if (_i == 5)
-	{
-		m_position.z += hScale.z; //Away
-		m_normal = glm::vec3(0.0f, 0.0f, 1.0f);
-		m_scale.z = 0.0f;
-	}
-} */
 
 GameObject::~GameObject()
 {
 	// Do any clean up here
 }
 
+void GameObject::addPlaneShape(std::string _texName, glm::vec3 _scale, glm::vec3 _normal)
+{
+	m_shape = "plane";
+	m_plane = new Plane(_texName, _scale, _normal);
+	m_shapeComp = m_plane;
+}
+
+void GameObject::addBoxShape(std::string _texName, glm::vec3 _scale)
+{
+	m_shape = "box";
+	m_box = new Box(_texName, _scale);
+	m_shapeComp = m_box;
+}
+
+void GameObject::addSphereShape(std::string _texName, float _radius)
+{
+	m_shape = "sphere";
+	m_sphere = new Sphere(_texName, _radius);
+	m_shapeComp = m_sphere;
+}
+
+void GameObject::addMeshShape(std::string _texName, std::string _obj, glm::vec3 _scale, glm::vec3 _size)
+{
+	m_shape = "mesh";
+	m_mesh = new Mesh(_texName, _obj, _scale, _size);
+	m_shapeComp = m_mesh;
+}
+
+void GameObject::deleteShape()
+{
+	m_tag = "untagged";
+	m_shape = "NO SHAPE";
+	delete m_plane;
+	delete m_box;
+	delete m_sphere;
+	delete m_mesh;
+}
+
 void GameObject::addPhysics(std::string _tag, float _mass, float _bounciness)
 {
-	m_rb = new PhysicsObj();
+	m_rb = new PhysicsObj(_mass, _bounciness);
 	m_physics = true;
 	m_tag =  _tag;
-	m_mass = _mass;
-	m_bounciness = _bounciness;
-	m_rb->setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
+	
+	
 }
 
 void GameObject::removePhysics()
 {
 	m_physics = false;
-	m_mass = INFINITY;
-	m_bounciness = 0.0f;
-	m_rb->clearForces();
-	m_rb->setVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
 	delete m_rb;
 }
 

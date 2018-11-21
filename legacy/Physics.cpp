@@ -1,15 +1,15 @@
-#include "Physics.h"
-#include "Utility.h"
 #include <iostream>
+#include "Physics.h"
+
+
 
 void Physics::update(GameObject * _my, std::vector<GameObject*> _other, float _dT)
 {
-	float gravity = m_gravity * _my->getMass(); 
-	_my->setVelocity(_my->m_rb->getVelocity());
+	float gravity = m_gravity * _my->m_rb->getMass(); 
 	_my->m_rb->addForce(glm::vec3(0.0f, gravity, 0.0f)); //Apply force due to gravity
-	glm::vec3 nextPos = _my->getPosition() + _my->getVelocity() * _dT;
+	glm::vec3 nextPos = _my->getPosition() + _my->m_rb->getVelocity() * _dT;
 	collide(_dT, _other, _my, nextPos); // Check Collisions
-	_my->setPosition(_my->m_rb->rungeKutta2(_dT, _my->getMass())); // Move via Runge Kutta 2
+	_my->setPosition(_my->m_rb->rungeKutta2(_dT, _my->m_rb->getMass())); // Move via Runge Kutta 2
 	_my->m_rb->clearForces();
 }
 
@@ -17,64 +17,62 @@ bool Physics::collide(float _dT, std::vector<GameObject*> _objects, GameObject* 
 {
 	for (int i = 0; i < _objects.size(); i++) // Check every object
 	{
-		if (_objects[i]->isSolid() && _objects[i]->isActive()) // Don't check collisions against inactive objects and against non-solids
-		{
-			bool cancel = false;
-			
+		if (_objects[i]->m_shapeComp->isSolid() && _objects[i]->isActive()) // Don't check collisions against inactive objects and against non-solids
+		{			
 			if (_objects[i]->getTag() == _my->getTag()) // Don't collide with yourself
 			{
+				std::string otherShape = _objects[i]->getShape(); // The other object type
+				std::string myShape = _my->getShape(); // My object type
+				bool collision = false; 
 
-				std::string shape = _objects[i]->getType(); // The other object type
-				std::string type = _my->getType(); // My object type
-
-
-				if (type == "sphere") // If current object is a sphere
+				if (myShape == "sphere") // If current object is a sphere
 				{
 					//Y + P
-					if (shape == "sphere")
+					if (otherShape == "sphere")
 					{
-						_my->m_rb->setCollided(utility::sphereToSphere(_my, _objects[i], _c1));
+						collision = utility::sphereToSphere(_my, _objects[i], _c1);
+						_my->m_rb->setCollided(collision);
 					}
 
 
 					//Y + P
-					else if (shape == "plane")
+					else if (otherShape == "plane")
 					{
 
 					}
 
-					else if (shape == "mesh")
+					else if (otherShape == "mesh")
 					{
 
 					}
 
-					else if (shape == "box")
+					else if (otherShape == "box")
 					{
 
 
 					}
 				}
 
-				else if (type == "box")
+				else if (myShape == "box")
 				{
-					if (shape == "sphere")
+					if (otherShape == "sphere")
 					{
 
 					}
 
 
 					//Y + P
-					else if (shape == "plane")
+					else if (otherShape == "plane")
 					{
 
 					}
 
-					else if (shape == "mesh")
+					else if (otherShape == "mesh")
 					{
 
 					}
 
-					else if (shape == "box")
+					else if (otherShape == "box")
 					{
 
 
@@ -83,43 +81,34 @@ bool Physics::collide(float _dT, std::vector<GameObject*> _objects, GameObject* 
 				}
 
 
-				else if (type == "mesh")
+				else if (myShape == "mesh")
 				{
-					if (shape == "sphere")
+					if (otherShape == "sphere")
 					{
 
 					}
 
 
 
-					else if (shape == "plane")
+					else if (otherShape == "plane")
 					{
 
 					}
 
-					else if (shape == "mesh")
+					else if (otherShape == "mesh")
 					{
 
 					}
 
-					else if (shape == "box")
+					else if (otherShape == "box")
 					{
 
 
 					}
-
-				}  // End of collision code
-
-
-
-				
+				}  // End of collision code				
 			}
-
 		}
-
-	}
-		
-	
+	}	
 	return false;
 }
 
@@ -129,7 +118,7 @@ void Physics::handleCollisions(GameObject * _object)
 	for (int i = 0; i < collision.size(); i++)
 	{
 		_object->setPosition(collision[i]->m_cP);
-		_object->m_rb->setVelocity(_object->getVelocity() + collision[i]->m_deltaVel);
+		_object->m_rb->setVelocity(_object->m_rb->getVelocity() + collision[i]->m_deltaVel);
 		
 	}
 	_object->m_rb->resetCollisions();

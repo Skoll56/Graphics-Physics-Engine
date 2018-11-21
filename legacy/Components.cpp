@@ -1,5 +1,17 @@
 #include "Components.h"
 
+PhysicsObj::PhysicsObj(float _mass, float _bounciness)
+{
+	m_mass = _mass;
+	m_bounciness = _bounciness;
+}
+
+PhysicsObj::PhysicsObj()
+{
+	m_mass = 10.0f;
+	m_bounciness = 0.0f;
+}
+
 glm::vec3 PhysicsObj::rungeKutta2(float _deltaTs, float _mass)
 {
 	glm::vec3 a = m_force / _mass;
@@ -10,19 +22,7 @@ glm::vec3 PhysicsObj::rungeKutta2(float _deltaTs, float _mass)
 }
 
 
-Collision::Collision(glm::vec3 _cP, glm::vec3 _norm, GameObject* _other, GameObject* _my)
-{
-	m_cP = _cP;
-	m_normal = _norm;
 
-	float invBounce = 0.0f - (1 + _my->m_rb->getBounciness());
-	m_velDif = _my->getVelocity() - _other->getVelocity();
-	m_massCalc = (1.0f / _my->getMass()) + (1.0f / _other->getMass());
-	m_resultForce = glm::dot(invBounce * m_velDif, m_normal) / m_massCalc;
-	m_deltaVel = (m_resultForce * m_normal) / _my->getMass();
-
-	// Write response code here
-}
 
 void PhysicsObj::resetCollisions()
 {
@@ -30,13 +30,70 @@ void PhysicsObj::resetCollisions()
 	m_collided = false;
 }
 
-Box::Box(std::string _texName)
+Box::Box(std::string _texName, glm::vec3 _scale)
 {
 	m_vBOp = new VertexBuffer();
 	m_vBOt = new VertexBuffer();
 	m_vAO = new VertexArray();
 	m_tex = new Texture();
+	m_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+	m_size = glm::vec3(1.0f, 1.0f, 1.0f);
+	m_scale = _scale;
+	m_solid = true;
+	m_tex->addTexture(_texName);
+	m_vAO->loadObj("1b1cube.obj");
+}
+
+Plane::Plane(std::string _texName, glm::vec3 _scale, glm::vec3 _normal)
+{
+	m_vBOp = new VertexBuffer();
+	m_vBOt = new VertexBuffer();
+	m_vAO = new VertexArray();
+	m_tex = new Texture();
+	m_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+	m_scale = _scale;
+	m_tex->addTexture(_texName);
+	m_size = glm::vec3(1.0f, 0.0f, 1.0f);
+	m_mass = INFINITY;
+	m_solid = true;
+	m_normal = _normal;
+	m_vAO->loadObj("1b1plane.obj");
+	m_tex->addTexture(_texName);
+	
+
+}
+
+Sphere::Sphere(std::string _texName, float _radius)
+{
+	m_vBOp = new VertexBuffer();
+	m_vBOt = new VertexBuffer();
+	m_vAO = new VertexArray();
+	m_tex = new Texture();
+	m_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+	m_scale = glm::vec3(_radius, _radius, _radius);
+	m_tex->addTexture(_texName);
 	m_size = glm::vec3(1.0f, 1.0f, 1.0f);
 	m_mass = INFINITY;
 	m_solid = true;
+	m_radius = _radius;
+	m_vAO->loadObj("1b1sphere.obj");
+	m_tex->addTexture(_texName);
+	
+}
+
+Mesh::Mesh(std::string _texName, std::string _obj, glm::vec3 _scale, glm::vec3 _size)
+{
+	m_vBOp = new VertexBuffer();
+	m_vBOt = new VertexBuffer();
+	m_vAO = new VertexArray();
+	m_tex = new Texture();
+	m_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+	m_scale = _scale;
+	m_tex->addTexture(_texName);
+	m_size = _size;
+	m_mass = INFINITY;
+	m_solid = true;
+	m_vAO->loadObj(_obj);
+	m_tex->addTexture(_texName);
+	
 }

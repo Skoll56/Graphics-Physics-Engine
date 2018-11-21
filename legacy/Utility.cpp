@@ -2,27 +2,29 @@
 #include <iostream>
 
 
+
 namespace utility
 {
 	
 	void update(GameObject* _obj, Shader* _shader, std::vector<GameObject*> _allObj, Physics *_physics, float _dT)
 	{
-		glm::mat4 modelMat = glm::mat4(1.0f);
-		modelMat = glm::translate(modelMat, _obj->getPosition());
-		modelMat = glm::scale(modelMat, _obj->getScale());
-		_obj->setModel(modelMat);
-		// < -- Rotate
+		glm::mat4 modelMat = glm::mat4(1.0f); // Model Matrix
+		modelMat = glm::translate(modelMat, _obj->getPosition()); // Translate by game object's position
+		modelMat = glm::scale(modelMat, _obj->m_shapeComp->getScale()); // Scale by shape object's scale
+		//Rotate by the shape component's rotation
+		_obj->m_shapeComp->setModel(modelMat); // Send the model matrix back to the shape component to be drawn
 		
-		_shader->setUniform("in_Model", _obj->getModel()); // Translate the model matrix by camera position and stuff	
-		_shader->setUniform("in_Texture", _obj->m_tex);
+		
+		_shader->setUniform("in_Model", _obj->m_shapeComp->getModel()); // Translate the model matrix by camera position and stuff	
+		_shader->setUniform("in_Texture", _obj->m_shapeComp->m_tex);
 
-		if (_obj->isPhysics())
+		if (_obj->isPhysics()) // Also update the shape's rigidbody if it has one. Checks for collisions and adjusts position
 		{
 			_physics->update(_obj, _allObj, _dT);
 		}
 
 	}
-	
+
 	float* CrossProduct(float *a, float *b) //Taken from somewhere
 	{
 		float Product[3];
@@ -37,23 +39,25 @@ namespace utility
 
 	float distanceToPlane(glm::vec3 & _n, glm::vec3 & _p, glm::vec3 & _q)
 	{
-
-		return glm::dot((_p-_q), _n);
+		return glm::dot((_p - _q), _n);
 	}
 
+
+	//Shape Intersection functions
+
 	//Works except on boxes
-	bool sphereToPlane(Sphere *_my, Plane *_plane, glm::vec3 _c1)
+	bool sphereToPlane(GameObject *_my, GameObject *_other, glm::vec3 _c1)
 	{
-		glm::vec3 n = _plane->getNorm();
-		glm::vec3 q = _plane->getPosition();
+		glm::vec3 n = _other->m_plane->getNorm();
+		glm::vec3 q = _other->getPosition();
 		glm::vec3 c0 = _my->getPosition();
 		glm::vec3 permCP = _my->m_rb->getPermCP();
 		glm::vec3 ci;
 
-		float r = _my->getRadius();
+		float r = _my->m_sphere->getRadius();
 		float dis2Plane = distanceToPlane(n, c0, q);
 		float dis2Plane2 = distanceToPlane(n, _c1, q);		
-		glm::vec3 length = (_plane->getScale() / 2.0f);
+		glm::vec3 length = (_other->m_shapeComp->getScale() / 2.0f);
 
 		if (fabs(dis2Plane) <= r) //If already colliding with the plane
 		{	
@@ -66,7 +70,7 @@ namespace utility
 			glm::vec3 dif = c0 - permCP;
 			dif *= n;
 			ci = c0 - dif;
-			_my->m_rb->m_collisions.push_back(new Collision(ci, n));			
+			_my->m_rb->m_collisions.push_back(new Collision(ci, n, _other, _my));			
 			return true;
 		} 
 
@@ -85,7 +89,7 @@ namespace utility
 				ci *= -1.0f;
 			}
 			_my->m_rb->setPermCP(ci);
-			_my->m_rb->m_collisions.push_back(new Collision(ci, n));
+			_my->m_rb->m_collisions.push_back(new Collision(ci, n, _other, _my));
 			return true;
 
 		}
@@ -96,39 +100,39 @@ namespace utility
 
 
 	//Works
-	bool sphereToSphere(Sphere *_my, Sphere *_sphere, glm::vec3 _c1)
+	bool sphereToSphere(GameObject *_my, GameObject *_other, glm::vec3 _c1)
 	{
 		glm::vec3 c0 = _my->getPosition();
-		glm::vec3 c1 = _sphere->getPosition();
-		float r1 = _my->getRadius();
-		float r2 = _sphere->getRadius();
+		glm::vec3 c1 = _other->getPosition();
+		float r1 = _my->m_sphere->getRadius();
+		float r2 = _other->m_sphere->getRadius();
 		float d = glm::length(c0 - c1);
 
 		if (d <= r1 + r2)
 		{
 			glm::vec3 sN = glm::normalize(c0 - c1);
 			glm::vec3 cp =  (r1 * sN) + (c1 + r2 * sN);
-			_my->m_rb->m_collisions.push_back(new Collision(cp, sN));
+			_my->m_rb->m_collisions.push_back(new Collision(cp, sN, _other, _my));
 			return true;
 		}
 		else { return false; }
 	}
 
 	//Empty
-	bool boxToSphere(Box *_my, Sphere *_sphere, glm::vec3 _c1)
+	bool boxToSphere(GameObject *_my, GameObject *_other, glm::vec3 _c1)
 	{
-
+		return false;
 	}
 
 	
 
-	bool boxToBox(Box *_my, Box* _box, glm::vec3 _c1)
+	bool boxToBox(GameObject *_my, GameObject* _other, glm::vec3 _c1)
 	{
 		
-		glm::vec3 otherP = _box->getPosition();
+		glm::vec3 otherP = _other->getPosition();
 		glm::vec3 pos = _my->getPosition();
-		glm::vec3 length = ((_my->getScale() / 2.0f) * _my->getSize());
-		glm::vec3 oLength = ((_box->getScale() / 2.0f) * _my->getSize());
+		glm::vec3 length = ((_my->m_shapeComp->getScale() / 2.0f) * _my->m_shapeComp->getSize()); // We factor size into the calculations because meshes use the same collision function
+		glm::vec3 oLength = ((_other->m_shapeComp->getScale() / 2.0f) * _other->m_shapeComp->getSize());
 
 		if (pos.x + length.x >= otherP.x - oLength.x && pos.x - length.x <= otherP.x + oLength.x)
 		{
@@ -146,23 +150,23 @@ namespace utility
 	}
 
 	//Works
-	bool boxToPlane(Box *_my, Plane * _plane, glm::vec3 _c1)
+	bool boxToPlane(GameObject *_my, GameObject * _other, glm::vec3 _c1)
 	{
 		glm::vec3 c0 = _my->getPosition();
-		glm::vec3 n = _plane->getNorm();
-		glm::vec3 q = _plane->getPosition();
-		glm::vec3 scale = _my->getScale();
+		glm::vec3 n = _other->m_plane->getNorm();
+		glm::vec3 q = _other->getPosition();
+		glm::vec3 scale = _my->m_shapeComp->getScale();
 		glm::vec3 ci;
 		float dis2Plane = distanceToPlane(n, c0, q);
 		float dis2Plane2 = distanceToPlane(n, _c1, q);
 		glm::vec3 edgePoint = c0 + scale / 2.0f;
 		float dEdge = glm::distance(edgePoint * n, c0 * n);
-		glm::vec3 length = _plane->getScale()/2.0f;
+		glm::vec3 pLength = _other->m_shapeComp->getScale()/2.0f;
 
 		if (fabs(dis2Plane) <= dEdge) //If already colliding with the plane
 		{
 
-			if (fabs(c0.x - scale.x / 2.0f) > q.x + length.x || fabs(c0.z - scale.z / 2.0f) > q.z + length.z) // If we fall off the plane
+			if (fabs(c0.x - scale.x / 2.0f) > q.x + pLength.x || fabs(c0.z - scale.z / 2.0f) > q.z + pLength.z) // If we fall off the plane
 			{
 				return false;
 			}
@@ -170,14 +174,14 @@ namespace utility
 			glm::vec3 dif = c0 - _my->m_rb->getPermCP();
 			dif *= n;
 			ci = c0 - dif;
-			_my->m_rb->m_collisions.push_back(new Collision(ci, n));
+			_my->m_rb->m_collisions.push_back(new Collision(ci, n, _other, _my));
 
 			return true;
 		}
 
 		if (fabs(dis2Plane) > dEdge && fabs(dis2Plane2) < dEdge) //If colliding with the plane during movement between two timesteps
 		{
-			if (fabs(c0.x - scale.x / 2.0f) > q.x + length.x || fabs(c0.z - scale.z / 2.0f) > q.z + length.z) // If we fall off the plane
+			if (fabs(c0.x - scale.x / 2.0f) > q.x + pLength.x || fabs(c0.z - scale.z / 2.0f) > q.z + pLength.z) // If we fall off the plane
 			{
 				return false;
 			}
@@ -189,7 +193,7 @@ namespace utility
 				ci *= -1.0f;
 			}
 			_my->m_rb->setPermCP(ci);
-			_my->m_rb->m_collisions.push_back(new Collision(ci, n));
+			_my->m_rb->m_collisions.push_back(new Collision(ci, n, _other, _my));
 			return true;
 		}
 		return false;
@@ -696,3 +700,4 @@ namespace utility
 
 
 }
+

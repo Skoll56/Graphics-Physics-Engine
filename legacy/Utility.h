@@ -1,8 +1,11 @@
+#ifndef _UTILITY_H_
+#define _UTILITY_H_
+
 #include <glm/glm.hpp>
 #include <GLM/gtc/matrix_transform.hpp>
-#include "Shapes.h"
 #include "Shader.h"
 #include "Physics.h"
+
 
 namespace utility
 {
@@ -11,13 +14,13 @@ namespace utility
 	
 	float* CrossProduct(float *a, float *b);
 
-	bool sphereToPlane(Sphere *_my, Plane *_plane, glm::vec3 _c1);
-	bool sphereToSphere(Sphere *_my, Sphere *_sphere, glm::vec3 _c1);
+	bool sphereToPlane(GameObject *_my, GameObject *_other, glm::vec3 _c1);
+	bool sphereToSphere(GameObject *_my, GameObject *_other, glm::vec3 _c1);
 	
-	bool boxToSphere(Box *_my, Sphere *_sphere, glm::vec3 _c1);
+	bool boxToSphere(GameObject *_my, GameObject *_other, glm::vec3 _c1);
 
-	bool boxToBox(Box *_my, Box* _box, glm::vec3 _c1);
-	bool boxToPlane(Box *_my, Plane * _plane, glm::vec3 _c1);
+	bool boxToBox(GameObject *_my, GameObject* _other, glm::vec3 _c1);
+	bool boxToPlane(GameObject *_my, GameObject * _other, glm::vec3 _c1);
 	
 
 	void update(GameObject* _obj, Shader* _shader, std::vector<GameObject*> _allObj, Physics *_physics, float _dT);
@@ -34,3 +37,7 @@ namespace utility
 
 	int planeBoxOverlap(float normal[3], float d, float maxbox[3]);
 }
+
+
+
+#endif
