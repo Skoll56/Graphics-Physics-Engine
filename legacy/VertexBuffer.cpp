@@ -1,3 +1,5 @@
+#include <glm/glm.hpp>
+#include <gl/glew.h>
 #include "VertexBuffer.h"
 
 VertexBuffer::VertexBuffer()

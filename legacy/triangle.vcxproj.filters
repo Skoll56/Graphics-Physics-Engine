@@ -51,6 +51,12 @@
     <ClCompile Include="Collision.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VertexBuffer.h">
@@ -86,5 +92,45 @@
     <ClInclude Include="Collision.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Room.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\shaders\lightFrag.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\shaders\lightVert.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\shaders\simpleFrag.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\shaders\simpleVert.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\shaders\UI Frag.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="..\shaders\UI Vert.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Listtxt.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Capture.JPG">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

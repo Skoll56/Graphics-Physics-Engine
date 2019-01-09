@@ -1,0 +1,33 @@
+
+
+To DO LIST
+
+Graphics:
+Fix Collisions with walls [X]
+Make FlashLight []
+Make Enemy/Player entities []
+Make the self-building rooms []
+Make the Lovecraftian shader []
+Shadows ? []
+Fist working []
+Gun working []
+UI []
+Blotch [X]
+Dynamically introduce lights []
+
+
+Physics:
+Add txt maploading [] W
+Add real friction [] W
+Box:Box collisions [?] <-- Needs 'floored' precision to not fall through the floor
+Converting box collision boxes after rotation [?] <-- Needs testing
+Box:Plane collisions []
+Fix torque using Quats [X]
+Sphere:box collision[]
+
+
+
+Engine:
+Make a room-build function [X]
+Add corridor building with a door []
+Fix collisions in corners [] W or K

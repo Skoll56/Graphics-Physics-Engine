@@ -1,9 +1,7 @@
 #ifndef _VertexBuffer_H_
 #define _VertexBuffer_H_
-
-#include <glm/glm.hpp>
 #include <vector>
-#include <gl/glew.h>
+#include <GL/glew.h>
 
 class VertexBuffer
 

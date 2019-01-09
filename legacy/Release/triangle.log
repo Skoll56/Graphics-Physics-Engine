@@ -1,0 +1,80 @@
+﻿  Camera.cpp
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Input.h(4): warning C4099: 'Input': type name first seen using 'class' now seen using 'struct'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Input.h(3): note: see declaration of 'Input'
+  Collision.cpp
+  Components.cpp
+  GameObject.cpp
+  Input.cpp
+  main.cpp
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Scene.h(11): warning C4099: 'Input': type name first seen using 'struct' now seen using 'class'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Input.h(4): note: see declaration of 'Input'
+main.cpp(50): warning C4244: 'initializing': conversion from 'Uint32' to 'float', possible loss of data
+main.cpp(52): warning C4244: '=': conversion from 'float' to 'long', possible loss of data
+main.cpp(75): warning C4244: 'argument': conversion from 'float' to 'Uint32', possible loss of data
+  Physics.cpp
+Physics.cpp(26): warning C4018: '<': signed/unsigned mismatch
+Physics.cpp(134): warning C4018: '<': signed/unsigned mismatch
+Physics.cpp(1129): warning C4005: 'CROSS': macro redefinition
+  Physics.cpp(826): note: see previous definition of 'CROSS'
+Physics.cpp(1136): warning C4005: 'SUB': macro redefinition
+  Physics.cpp(833): note: see previous definition of 'SUB'
+  Scene.cpp
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Input.h(4): warning C4099: 'Input': type name first seen using 'class' now seen using 'struct'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Input.h(3): note: see declaration of 'Input'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Camera.h(1): warning C4099: 'Input': type name first seen using 'struct' now seen using 'class'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Input.h(4): note: see declaration of 'Input'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(6): warning C4099: 'PointLight': type name first seen using 'class' now seen using 'struct'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(5): note: see declaration of 'PointLight'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(31): warning C4099: 'DirLight': type name first seen using 'class' now seen using 'struct'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(30): note: see declaration of 'DirLight'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(55): warning C4099: 'SpotLight': type name first seen using 'class' now seen using 'struct'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(54): note: see declaration of 'SpotLight'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Utility.h(8): warning C4099: 'SpotLight': type name first seen using 'struct' now seen using 'class'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(55): note: see declaration of 'SpotLight'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Utility.h(9): warning C4099: 'DirLight': type name first seen using 'struct' now seen using 'class'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(31): note: see declaration of 'DirLight'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Utility.h(10): warning C4099: 'PointLight': type name first seen using 'struct' now seen using 'class'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(6): note: see declaration of 'PointLight'
+Scene.cpp(83): warning C4018: '<': signed/unsigned mismatch
+Scene.cpp(217): warning C4018: '<': signed/unsigned mismatch
+  Shader.cpp
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(6): warning C4099: 'PointLight': type name first seen using 'class' now seen using 'struct'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(5): note: see declaration of 'PointLight'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(31): warning C4099: 'DirLight': type name first seen using 'class' now seen using 'struct'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(30): note: see declaration of 'DirLight'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(55): warning C4099: 'SpotLight': type name first seen using 'class' now seen using 'struct'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(54): note: see declaration of 'SpotLight'
+Shader.cpp(270): warning C4244: 'argument': conversion from '::size_t' to 'GLfloat', possible loss of data
+Shader.cpp(283): warning C4244: 'argument': conversion from 'unsigned int' to 'GLfloat', possible loss of data
+  stb_image.cpp
+  Texture.cpp
+  Utility.cpp
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(6): warning C4099: 'PointLight': type name first seen using 'class' now seen using 'struct'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(5): note: see declaration of 'PointLight'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(31): warning C4099: 'DirLight': type name first seen using 'class' now seen using 'struct'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(30): note: see declaration of 'DirLight'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(55): warning C4099: 'SpotLight': type name first seen using 'class' now seen using 'struct'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(54): note: see declaration of 'SpotLight'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Input.h(4): warning C4099: 'Input': type name first seen using 'class' now seen using 'struct'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Input.h(3): note: see declaration of 'Input'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Room.h(3): warning C4099: 'PointLight': type name first seen using 'struct' now seen using 'class'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(6): note: see declaration of 'PointLight'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Scene.h(6): warning C4099: 'SpotLight': type name first seen using 'struct' now seen using 'class'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(55): note: see declaration of 'SpotLight'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Scene.h(7): warning C4099: 'DirLight': type name first seen using 'struct' now seen using 'class'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Light.h(31): note: see declaration of 'DirLight'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Scene.h(8): warning C4099: 'PointLight': type name first seen using 'struct' now seen using 'class'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Room.h(3): note: see declaration of 'PointLight'
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Scene.h(11): warning C4099: 'Input': type name first seen using 'struct' now seen using 'class'
+  d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\Input.h(4): note: see declaration of 'Input'
+Utility.cpp(34): warning C4018: '<': signed/unsigned mismatch
+Utility.cpp(173): warning C4018: '<': signed/unsigned mismatch
+Utility.cpp(193): warning C4018: '<': signed/unsigned mismatch
+Utility.cpp(210): warning C4018: '<': signed/unsigned mismatch
+  VertexArray.cpp
+  VertexBuffer.cpp
+  Generating code
+d:\users\skoll\onedrive - bournemouth university\work\year 2\3d graphics\triangle\3d assignment\legacy\physics.cpp(789): warning C4715: 'Physics::meshToMesh': not all control paths return a value
+  All 1524 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  triangle.vcxproj -> D:\Users\Skoll\OneDrive - Bournemouth University\Work\Year 2\3D Graphics\triangle\3D Assignment\legacy\Release\triangle.exe

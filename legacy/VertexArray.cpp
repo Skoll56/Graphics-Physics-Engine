@@ -1,8 +1,9 @@
-#include "VertexArray.h"
-#include "VertexBuffer.h"
-
+#include <GL/glew.h>
+#include <glm/glm.hpp>
 #include <fstream>
 #include <iostream>
+#include "VertexArray.h"
+#include "VertexBuffer.h"
 
 void VertexArray::splitStringWhitespace(std::string& input, std::vector<std::string>& output)
 {
@@ -161,6 +162,7 @@ VertexArray::VertexArray(std::string path) : m_dirty(false)
 
 void VertexArray::loadObj(std::string path)
 {
+	path = "../Models/" + path;
 	std::ifstream file(path.c_str());
 
 	if (!file.is_open())
@@ -270,7 +272,7 @@ void VertexArray::setBuffer(std::string attribute, VertexBuffer *buffer)
   }
   else if(attribute == "in_Color")
   {
-    m_buffers.at(1) = buffer;
+    m_buffers.at(2) = buffer;
   }
   else if(attribute == "in_TexCoord")
   {
@@ -278,7 +280,7 @@ void VertexArray::setBuffer(std::string attribute, VertexBuffer *buffer)
   }
   else if(attribute == "in_Normal")
   {
-    m_buffers.at(3) = buffer;
+    m_buffers.at(1) = buffer;
   }
   else
   {

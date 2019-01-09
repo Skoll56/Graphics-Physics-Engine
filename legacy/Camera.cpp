@@ -1,21 +1,18 @@
-#include "Camera.h"
 #include <iostream>
+#include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+#include "Camera.h"
+#include "Input.h"
 
-Camera::Camera(glm::vec3 _startPos, glm::vec3 _startRot)
+Camera::Camera(glm::vec3 _startPos)
 {
 	m_pos = _startPos;
-	m_rot = _startRot;
-	m_angle = 0.0f;
+	m_upVec = glm::vec3(0.0f, 1.0f, 0.0f);
+	m_yaw = 90.0f;
+	m_pitch = 0.0f;
 	m_speed = 15.0f;
-	m_left = false;
-	m_right = false;
-	m_up = false;
-	m_down = false;
-	m_asc = false;
-	m_desc = false;
-	m_r1 = false;
-	m_r2 = false;
-	m_rotSpeed = 4.0f;
+	m_rotSpeed = 2.0f;
 }
 
 Camera::~Camera()
@@ -23,59 +20,37 @@ Camera::~Camera()
 
 }
 
-void Camera::update(float _dTime)
+void Camera::update(float _dTime, Input *_input)
 {
-	glm::mat4 temp(1.0f);
-	
-	glm::vec3 direction = glm::vec3(0, 0, 0);
-
-	if (m_left) 
-	{ 
-		direction.x -= 1;		
-	}
-	if (m_right)
-	{ 
-		direction.x += 1;
-	}
-	if (m_up)
-	{	
-		direction.z -= 1;
-	}
-	if (m_down)
-	{ 
-		direction.z += 1;
-	}
-
-	if (m_asc)
+	if (_input->m_r1)
 	{
-		direction.y += 1;
+		m_yaw += m_rotSpeed;
 	}
 
-	if (m_desc)
+	if (_input->m_r2)
 	{
-		direction.y -= 1;
+		m_yaw -= m_rotSpeed;
 	}
 
-	if (m_r1)
+	if (_input->m_r)
 	{
-		m_angle -= m_rotSpeed;
+		m_pitch += m_rotSpeed;
 	}
 
-	if (m_r2)
+	if (_input->m_f)
 	{
-		m_angle+= m_rotSpeed;
+		m_pitch -= m_rotSpeed;
 	}
 
-		temp = glm::rotate(temp, glm::radians(m_angle), glm::vec3(0, 1, 0));
-		temp = glm::translate(temp, direction);
-		glm::vec3 fwd = temp * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-		if (fwd != glm::vec3(0, 0, 0))
-		{
-			fwd = glm::normalize(fwd);
-		}
-		m_pos += fwd * m_speed * _dTime;
-		//m_rot += fwd * _dTime;
-		//m_viewMat = glm::lookAt(m_pos, m_pos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	if (m_pitch > 89.0f) { m_pitch = 89.0f; }
+	else if (m_pitch < -89.0f) { m_pitch = -89.0f; }
+	if (m_yaw > 360.0f) { m_yaw = 0.0f; }
+	else if (m_yaw < -360.0f) { m_yaw = 0.0f; }
 
-		//std::cout << m_pos.y << std::endl;
+	//Reference LearnOpenGL
+	m_fwd.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+	m_fwd.y = sin(glm::radians(m_pitch));
+	m_fwd.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+	m_fwd = glm::normalize(m_fwd);
+	m_right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), m_fwd));
 }

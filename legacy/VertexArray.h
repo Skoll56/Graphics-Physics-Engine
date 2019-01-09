@@ -1,11 +1,8 @@
 #ifndef _VertexArray_H_
 #define _VertexArray_H_
-
-#include <GL/glew.h>
-#include <glm/glm.hpp>
-
 #include <vector>
 #include <string>
+#include <GL/glew.h>
 
 class VertexBuffer;
 
