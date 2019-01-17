@@ -11,12 +11,51 @@ class VertexBuffer;
 class Texture;
 
 
-class Component
+class Component //All the components used in the engine are currently stored here
 {
 
 };
 
+class Stats : public Component
+{
+public:
+	Stats(float _hp, float _dmg, float _speed)
+	{
+		m_HP = _hp;
+		m_DMG = _dmg;
+		m_speed = _speed;
+		m_direction = glm::vec3(0.0f, 0.0f, 0.0f);
+		m_hornet = false;
+		m_zter = false;
+		m_player = false;
+	}
+	float getHP() { return m_HP; }
+	float getDMG() { return m_DMG; }
+	float getSpeed() { return m_speed; }
+	glm::vec3 getDir() { return m_direction; }
 
+	void setHP(float _hp) { m_HP = _hp; }
+	void addHP(float _amt) { m_HP += _amt; }
+	void setSpeed(float _speed) { m_speed = _speed; }	
+	void setDir(glm::vec3 _dir) { m_direction = _dir; }
+	void setDMG(float _dmg) { m_DMG = _dmg; }
+	bool isPlayer() { return m_player; }
+	bool isHornet() { return m_hornet; }
+	bool isZter() { return m_zter; }
+	void setZter() { m_zter = true; }
+	void setHornet() { m_hornet = true; }
+
+private:
+	glm::vec3 m_direction;
+	float m_HP;
+	float m_DMG;
+	float m_speed;
+
+	//Checks what type of entity they are
+	bool m_player;
+	bool m_hornet;
+	bool m_zter;
+};
 
 class Shape : public Component
 {
@@ -101,11 +140,13 @@ class Mesh : public Shape
 {
 public:
 	Mesh(std::string _texName, std::string _obj, glm::vec3 _scale, glm::vec3 _size);
+	Mesh(std::string _texName, glm::vec3 _scale);
 	Mesh() {};
-	void setSemi(bool _val) { m_semiMesh = _val; }
-	bool getSemi() { return m_semiMesh; }
+	void setEasy(bool _val) { m_easyCollide = _val; }
+	bool isEasy() { return m_easyCollide; }
 private:
 	bool m_semiMesh;
+	bool m_easyCollide;
 };
 
 
@@ -155,10 +196,13 @@ public:
 	void setLastCol(std::string _tag) { m_lastMesh = _tag; }
 	void setFloored(bool _val) { m_floored = _val; }
 	bool isFloored() { return m_floored; }
+	void setCollider(bool _val) { m_collider = _val; }
+	bool isCollider() { return m_collider; }
 
 private:
 	glm::vec3 m_permCP; // A "permanent" contact-point that stores where an object should remain once stationary (ie: stacked on top of another object)
 	float m_mass;
+	bool m_collider;
 	float m_bounciness;
 	glm::vec3 m_velocity;
 	glm::vec3 m_force;

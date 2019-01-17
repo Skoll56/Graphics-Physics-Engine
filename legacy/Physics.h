@@ -4,6 +4,7 @@
 
 class GameObject;
 class Collision;
+class RayCollision;
 
 namespace Physics
 {
@@ -31,9 +32,16 @@ namespace Physics
 
 	bool sphereToPlane(GameObject *_my, GameObject *_other, glm::vec3 _c1);
 	bool boxToPlane(GameObject *_my, GameObject * _other, glm::vec3 _c1);
-
-	bool sphereToSphere(GameObject *_my, GameObject *_other, glm::vec3 _c1);
+	bool sphereToBox(GameObject *_my, GameObject *_other, glm::vec3 _c1);
+	bool sphereToSphere(GameObject *_my, GameObject *_other);
 	bool boxToSphere(GameObject *_my, GameObject *_other, glm::vec3 _c1);
+	bool sphereBoxOverlap(GameObject* _sphere, GameObject *_box);
+	RayCollision* rayToTri(std::vector<GameObject*> _obj, glm::vec3 _rayDir, glm::vec3 _origin, std::string _rayTag);
+
+	//Reference Tomas Moller
+	int intersect_triangle3(double orig[3], double dir[3], double vert0[3], double vert1[3], double vert2[3], double *t, double *u, double *v);
+	//T = distance to the triangle
+	//U and V are two points inside the triangle
 
 	glm::vec3 roundNormals(glm::vec3 _n);
 

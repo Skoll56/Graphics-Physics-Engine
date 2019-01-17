@@ -49,6 +49,14 @@ void GameObject::addMeshShape(std::string _texName, std::string _obj, glm::vec3 
 	m_shapeComp = m_mesh;
 }
 
+void GameObject::addMeshShape(std::string _texName, glm::vec3 _scale, std::string _tag)
+{
+	m_tag = _tag; // All meshes must have a tag for optimisation purposes in the collision
+	m_shape = "mesh";
+	m_mesh = new Mesh(_texName,_scale);
+	m_shapeComp = m_mesh;
+}
+
 void GameObject::deleteShape()
 {
 	m_tag = "untagged";
@@ -57,6 +65,12 @@ void GameObject::deleteShape()
 	delete m_box;
 	delete m_sphere;
 	delete m_mesh;
+}
+
+void GameObject::addStats(float _hp, float _dmg, float _speed)
+{
+	m_charSheet = new Stats(_hp, _dmg, _speed);
+	m_stats = true;
 }
 
 void GameObject::addPhysics(std::string _tag, float _mass, float _bounciness)

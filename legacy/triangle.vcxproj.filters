@@ -124,13 +124,11 @@
     <Text Include="..\shaders\UI Vert.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="Listtxt.txt">
+    <Text Include="..\shaders\monsterFrag.txt">
       <Filter>Resource Files</Filter>
     </Text>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\Capture.JPG">
+    <Text Include="..\shaders\invFrag.txt">
       <Filter>Resource Files</Filter>
-    </Image>
+    </Text>
   </ItemGroup>
 </Project>

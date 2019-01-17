@@ -23,78 +23,120 @@ void Physics::handleCollisions(GameObject * _object) // Handles multiple collisi
 {
 	std::vector<Collision*> collision = _object->m_rb->m_collisions;
 
+
 	for (int i = 0; i < collision.size(); i++)
 	{
 		onCollision(collision[i]);
-		glm::vec3 move = _object->getPosition() - collision[i]->m_cP;		
-		
+		if (TAG("cat"))
+		{
+			int r = 5;
+		}
+
+		glm::vec3 move = _object->getPosition() - collision[i]->m_cP;
+		//The amount the object will move away from another object it collides with so as not to clip
+
 		if (_object->getShape() == "mesh") // To do: Make velocity in the offending direction turn to 0
 		{
 			collision[i]->m_deltaVel = glm::vec3(0.0f); // We don't want to adjust Mesh position here. Meshes get weird. Meshes only use pseudo-physics and do not need realistic responses.
 
 		}
+
+		//Floored is a simple boolean optimisation that is used to tell if an object is now resting on a flat surface
+		//If it is, we can simplify the responses to save time
+		if (_object->m_rb->isFloored() && move.y > 0.0f)
+		{
+			move.y = 0.0f;
+		}
+
 		_object->setPosition(_object->getPosition() - move);
 
-		
-		//To fix:
-		// Apply friction properly
-		// Stop the object growing for some reason
-		if (_object->isAdvancedPhysics())
-		{			
-			//Angular force = result force * normal * other shape's friction
-			glm::vec3 aForce = (collision[i]->m_resultForce * collision[i]->m_normal) * collision[i]->m_other->m_shapeComp->getFriction();
-			aForce /= 10.0f; //aForce is a little high, so dial it down.
-			if (aForce.y < 3.0f) { aForce.y = 0.0f; }
-
-			//Torque = cross product of the angular force and the point of contact on a sphere
-			glm::vec3 t = glm::cross(collision[i]->m_poC, aForce);
-			_object->m_Phy->addTorque(t);
-		}
-
-		if (TAG("boxio2"))
+		if (_object->getShape() != "mesh")
 		{
-			int r = 5;
-		}
-		else if (TAG("boxio"))
-		{
-			int r = 5;
-		}
+			//The friction co-efficient of two objects
+			float fricCoEf = collision[i]->m_my->m_shapeComp->getFriction() + collision[i]->m_other->m_shapeComp->getFriction() / 10.0f;
 
-		_object->m_rb->setVelocity((_object->m_rb->getVelocity() + collision[i]->m_deltaVel) * 0.99f); //Botched friction
-		if (_object->m_rb->isFloored())
-		{
-			glm::vec3 vel = _object->m_rb->getVelocity();
-			if (vel.y <= 0.0f)
+			//Also adjust angular velocity by an impulse value if it has advanced physics
+			if (_object->isAdvancedPhysics())
 			{
-				vel.y = 0.0f;
-				_object->m_rb->setVelocity(vel);
+				glm::vec3 vel = collision[i]->m_my->m_rb->getVelocity();
+				if (WITHIN(vel.x, 0.0f, 0.01f) && WITHIN(vel.z, 0.0f, 0.01f))
+				{
+					vel.y = 0.0f;
+				}
+
+				if (WITHIN(vel.y, 0.0f, 0.01f) && WITHIN(vel.z, 0.0f, 0.01f))
+				{
+					vel.x = 0.0f;
+				}
+
+				if (WITHIN(vel.x, 0.0f, 0.01f) && WITHIN(vel.y, 0.0f, 0.01f))
+				{
+					vel.z = 0.0f;
+				}
+
+				//If the result force gets too low, it starts to stop rolling prematurely
+				float rForce = collision[i]->m_resultForce;
+				if (rForce < 0.8f) { rForce = 0.8f; }
+
+				//Angular force
+				glm::vec3 aForce = (glm::cross(vel, collision[i]->m_normal) * rForce) * (fricCoEf * (collision[i]->m_my->m_rb->getMass() / -9.80f));
+				aForce *= -9.0f; //Scale the force to make it look realistic
+
+								 //Torque = Sum of the angular foces acting on an object
+				_object->m_Phy->addTorque(aForce);
 			}
+
+			glm::vec3 friction = _object->m_rb->getVelocity() / (fricCoEf * 100.0f);
+			_object->m_rb->setVelocity((_object->m_rb->getVelocity() + collision[i]->m_deltaVel) - friction);
 		}
- 		
 	}
-	
+
+	//Clears the collisions ready to re-detect next frame
 	_object->m_rb->resetCollisions();
 }
 
 
 void Physics::onCollision(Collision* _col) // Remember that only physics objects can be collided. Non-physics objects are collided WITH.
-// The 'My' will always be a physics object, but the 'other' can be any collider.
+										   // The 'My' will always be a physics object, but the 'other' can be any collider.
 {
-
+	if (_col->m_my->hasStats() && _col->m_other->hasStats())
+	{
+		if (_col->m_my->getTag() == "cat")
+		{
+			_col->m_my->m_charSheet->addHP(-_col->m_other->m_charSheet->getDMG());
+		}
+	}
 }
 
 void Physics::update(GameObject * _my, std::vector<GameObject*> _other, float _dT)
 {
-	glm::vec3 nextPos;
+	glm::vec3 nextPos; // A 'projected' position for next frame. I intent to remove this in favour of better methods.
+					   //You'll notice half the functions already ignore this
+
+	glm::vec3 vel = _my->m_rb->getVelocity();
+
+
 	if (_my->m_rb->isFloored() == false)
-	{		
+	{
 		float gravity = -9.81f * _my->m_rb->getMass();
 		_my->m_rb->addForce(glm::vec3(0.0f, gravity, 0.0f)); //Apply force due to gravity		
 	}
-	
 
-	glm::vec3 move = _my->m_rb->rungeKutta2(_dT, _my->m_rb->getMass());
-	
+	else //Another convenient optimisation that saves calculations and reduces 'jitter'
+	{
+		if (WITHIN(vel.y, 0.0f, 1.0f))
+		{
+			vel.y = 0.0f;
+			_my->m_rb->setVelocity(vel);
+		}
+	}
+
+	glm::vec3 move = _my->m_rb->rungeKutta2(_dT, _my->m_rb->getMass()); //The displacement due to velocity
+	if (_my->m_rb->isFloored() && move.y < 0.0f)
+	{
+		move.y = 0.0f; //Prevents glitching through the floor
+	}
+
 	_my->setPosition(_my->getPosition() + move); // Move via Runge Kutta 2
 
 	if (_my->isAdvancedPhysics())
@@ -102,126 +144,131 @@ void Physics::update(GameObject * _my, std::vector<GameObject*> _other, float _d
 		_my->m_Phy->updateRotations(_dT, _my->m_rb->collided());
 	}
 
-	_my->m_rb->setCollided(false); //We do this here instead of in 'Reset collision' because the rotational update needs to know
+	_my->m_rb->setCollided(false); //We do this here instead of in the 'Reset collision function' because the rotational update needs to know
 
 	nextPos = _my->getPosition() + move;
-	
+
 	bool collided = collide(_dT, _other, _my, nextPos); // Check Collisions
 
 	if (collided && _my->getShape() == "mesh")//Stop meshes from colliding
 	{
-		_my->setPosition(_my->getPosition() - move); // Go back
+		//_my->setPosition(_my->getPosition() - move);
+		// Go back. Mesh collision is imperfect, but this alongside the 'offset' value used in the intersection...
+		//...test helps keep meshes stable and unable to walk through solid objects
 	}
 
 	if (_my->isAdvancedPhysics())
 	{
-		_my->m_Phy->clearTorque();		
-	}
-
-	if (_my->m_rb->isFloored())
-	{
-		glm::vec3 vel = _my->m_rb->getVelocity();
-		if (vel.y < 0.0f) { vel.y = 0.0f; }
-		_my->m_rb->setVelocity(vel);
+		_my->m_Phy->clearTorque();
 	}
 
 	_my->m_rb->clearForces();
 }
 
+//Tests for collisions between pairs of shapes
 bool Physics::collide(float _dT, std::vector<GameObject*> _objects, GameObject* _my, glm::vec3 _c1)
 {
-	_my->m_rb->setFloored(false);
-	for (int i = 0; i < _objects.size(); i++) // Check every object
+	_my->m_rb->setFloored(false); //The floor is almost always the first object this checks, so if we're still colliding
+								  //With the floor, this should be 'true' for the following checks.
+	if (_my->m_shapeComp->isSolid())
 	{
-		if (_objects[i]->m_shapeComp->isSolid() && _objects[i]->isActive()) // Don't check collisions against inactive objects and against non-solids
-		{			
-			if (_objects[i]->getTag() != _my->getTag()) // Don't collide with yourself
+		for (int i = 0; i < _objects.size(); i++) // Check every object
+		{
+			if (_objects[i]->m_shapeComp->isSolid() && _objects[i]->isActive() && _objects[i]->getRoomNum() == _my->getRoomNum()) // Don't check collisions against inactive objects and against non-solids
 			{
-				std::string otherShape = _objects[i]->getShape(); // The other object type
-				std::string myShape = _my->getShape(); // My object type
-				bool collision = false; 
-
-				if (myShape == "sphere") // If current object is a sphere
+				if (_objects[i]->getTag() != _my->getTag()) // Don't collide with yourself
 				{
-					//Y + P
-					if (otherShape == "sphere")
+					std::string otherShape = _objects[i]->getShape(); // The other object type
+					std::string myShape = _my->getShape(); // My object type
+					bool collision = false;
+
+					if (myShape == "sphere") // If current object is a sphere
 					{
-						collision = sphereToSphere(_my, _objects[i], _c1);
-						if (collision) { _my->m_rb->setCollided(true); }
-					}
-
-					//Y + P
-					else if (otherShape == "plane")
-					{
-						collision = sphereToPlane(_my, _objects[i], _c1);
-						if (collision) { _my->m_rb->setCollided(true); }
-						
-					}
-
-					else if (otherShape == "mesh")
-					{
-
-					}
-
-					else if (otherShape == "box")
-					{
-
-
-					}
-				}
-
-				else if (myShape == "box")
-				{
-					if (otherShape == "sphere")
-					{
-
-					}
-
-
-					//Y + P
-					else if (otherShape == "plane")
-					{
-						collision = Physics::boxToPlane(_my, _objects[i], _c1);
-						if (collision)
+						//Y + P
+						if (otherShape == "sphere")
 						{
-							 _my->m_rb->setCollided(true); 
+							collision = sphereToSphere(_my, _objects[i]);
+							if (collision) { _my->m_rb->setCollided(true); }
+						}
+
+						//Y + P
+						else if (otherShape == "plane")
+						{
+							collision = sphereToPlane(_my, _objects[i], _c1);
+							if (collision) { _my->m_rb->setCollided(true); }
+
+						}
+
+						else if (otherShape == "mesh")
+						{
+							//Spheres have a high polygon count. Tri-sphere is needed here.
+						}
+
+						else if (otherShape == "box")
+						{
+							collision = sphereToBox(_my, _objects[i], _c1);
+							if (collision) { _my->m_rb->setCollided(true); }
+
 						}
 					}
 
-					else if (otherShape == "mesh")
+					else if (myShape == "box")
 					{
-
-					}
-
-					else if (otherShape == "box")
-					{
-						collision = Physics::boxToBox(_my, _objects[i], _c1);
-						if (collision)
+						if (otherShape == "sphere")
 						{
-							_my->m_rb->setCollided(true);
+							collision = Physics::boxToSphere(_my, _objects[i], _c1);
+							if (collision)
+							{
+								_my->m_rb->setCollided(true);
+							}
+						}
+
+
+						//Y + P
+						else if (otherShape == "plane")
+						{
+							collision = Physics::boxToPlane(_my, _objects[i], _c1);
+							if (collision)
+							{
+								_my->m_rb->setCollided(true);
+							}
+						}
+
+						else if (otherShape == "mesh")
+						{
+							//Tri box is needed here
+						}
+
+						else if (otherShape == "box")
+						{
+							collision = Physics::boxToBox(_my, _objects[i], _c1);
+							if (collision)
+							{
+								_my->m_rb->setCollided(true);
+							}
+
 						}
 
 					}
 
+					else if (myShape == "mesh")
+					{
+						collision = meshToMesh(_my, _objects[i], _c1);
+						if (collision) { _my->m_rb->setCollided(true); }
+
+					}  // End of collision code	
+
+
 				}
-
-				else if (myShape == "mesh")
-				{					
-					collision = meshToMesh(_my, _objects[i], _c1);
-					if (collision) { _my->m_rb->setCollided(true); }
-					
-				}  // End of collision code	
-
-
 			}
 		}
-	}	
+	}
 	return false;
 }
 
 float Physics::distanceToPlane(glm::vec3 & _n, glm::vec3 & _p, glm::vec3 & _q)
 {
-	return glm::dot((_p - _q), _n);
+	return glm::dot((_p - _q), _n); //This function has been provided by Professor Tang.
 }
 
 ///Shape Intersection functions
@@ -239,51 +286,45 @@ bool Physics::sphereToPlane(GameObject *_my, GameObject *_other, glm::vec3 _c1)
 	float dis2Plane = distanceToPlane(n, c0, q);
 	float dis2Plane2 = distanceToPlane(n, _c1, q);
 	glm::vec3 length = (_other->m_shapeComp->getScale() / 2.0f);
+	float a, b, c;
+	a = b = c = 0.0f;
+	a = 1.0f - fabs(n.x);
+	b = 1.0f - fabs(n.y);
+	c = 1.0f - fabs(n.z);
+	glm::vec3 invNormal = glm::vec3(a, b, c); //Checks the values that aren't the normal (Ie: Are in the plane's direction)
+
+											  //This creates 'adjacent' values. We want to know if we move adjacenetly off the plane in whatever direction it faces
+	glm::vec3 aLength = length * invNormal;
+	glm::vec3 aPos = c0 * invNormal;
+	glm::vec3 aPpos = q * invNormal;
+	glm::vec3 aRadius = r * invNormal;
 
 
-
-
-	if (fabs(dis2Plane) < r) //If already colliding with the plane
+	if (fabs(dis2Plane) <= r) //If already colliding with the plane
 	{
-		if (fabs(c0.x) > q.x + length.x || fabs(c0.z) > q.z + length.z) // If we fall off the plane
-		{
-			return false;  
-		}		 
-
-		if (permCP == glm::vec3(0.0f, 0.0f, 0.0f))
-		{
-			permCP = q + r * n;
-		}
-		glm::vec3 dif = c0 - permCP;
-		dif *= n;
-		ci = c0 - dif;
-		_my->m_rb->m_collisions.push_back(new Collision(ci, n, _other, _my));
-		return true;
-	}
-
-	if (fabs(dis2Plane) >= r && fabs(dis2Plane2) < r) //If colliding with the plane during movement between two timesteps
-	{
-		if (fabs(c0.x) > q.x + length.x || fabs(c0.z) > q.z + length.z) // If we fall off the plane
+		if (aPos.x > aPpos.x + aLength.x || aPos.y > aPpos.y + aLength.y || aPos.z > aPpos.z + aLength.z) // If we fall off the plane
 		{
 			return false;
 		}
-		
 
-		float t = (dis2Plane - r) / (dis2Plane - dis2Plane2);
-		ci = (1.0f - t) * c0 + t * _c1;
-		if (dis2Plane < 0.0f) // If under the plane
+		if (_other->getTag() != "temp") //Temp is a temporary plane used in some collision checking. 
+										//This will likely be removed at some point
 		{
-			ci *= -1.0f;
+
+			glm::vec3 d2p = dis2Plane * n;
+			d2p -= r * n;
+			ci = c0 - d2p;
+			_my->m_rb->m_collisions.push_back(new Collision(ci, n, _other, _my));
 		}
-		_my->m_rb->setPermCP(ci);
-		_my->m_rb->m_collisions.push_back(new Collision(ci, n, _other, _my));
 		return true;
 	}
+
+
 	else { return false; }
 }
 
 //Works with physics
-bool Physics::sphereToSphere(GameObject *_my, GameObject *_other, glm::vec3 _c1)
+bool Physics::sphereToSphere(GameObject *_my, GameObject *_other)
 {
 	glm::vec3 c0 = _my->getPosition();
 	glm::vec3 c1 = _other->getPosition();
@@ -301,9 +342,134 @@ bool Physics::sphereToSphere(GameObject *_my, GameObject *_other, glm::vec3 _c1)
 	else { return false; }
 }
 
-//Empty
+//Works
 bool Physics::boxToSphere(GameObject *_my, GameObject *_other, glm::vec3 _c1)
 {
+
+	if (Physics::sphereBoxOverlap(_other, _my))
+	{
+		glm::vec3 otherP = _other->getPosition();
+		glm::vec3 pos = _my->getPosition();
+		glm::vec3 length, oLength;
+		std::vector<glm::vec3> normals;
+		normals.resize(6);
+		normals[0] = UP;
+		normals[1] = DOWN;
+		normals[2] = LEFT;
+		normals[3] = RIGHT; //Need to multiply by rotmat
+		normals[4] = FORWARDS;
+		normals[5] = BACKWARDS;
+
+
+		//Other object's length
+		oLength = _other->m_sphere->getRadius() * _other->m_shapeComp->getSize(); //Should be 1, but just incase.
+		if (_my->isAdvancedPhysics() == false)
+		{
+			length = ((_my->m_shapeComp->getScale() / 2.0f) * _my->m_shapeComp->getSize());
+		}
+		else
+		{
+			length = ((_my->m_shapeComp->getScale() / 2.0f) * _my->m_shapeComp->getSize()) * _my->m_Phy->getRotMat(); //Experimental
+		}
+		float lowest = INFINITY;
+		int winFace;
+		for (int i = 0; i < 6; i++) // For each face
+		{
+			glm::vec3 pL = otherP + (oLength * normals[i]); //Check which direction is the best suited for this collision
+			glm::vec3 sL = pos - (length * normals[i]);
+			float dToFace = fabs(Physics::distanceToPlane(normals[i], sL, pL));
+
+			if (dToFace < lowest) // Check which face most closely 'faces' us
+			{
+				lowest = dToFace;
+				winFace = i; //We can only have collided with the face that faces us. 
+			}
+		}
+		glm::vec3 n = normals[winFace];
+		if (pos.z < otherP.z)
+		{
+			n.z = -n.z;
+		}
+
+		glm::vec3 expected = (otherP + (oLength * n) + (length * n)); //Expected position in the normal
+		glm::vec3 dif = ((pos * n) - (expected * n)) * n; //Difference between ^ and actual position
+		glm::vec3 cp = pos - dif; //Aforementioned difference saved and ready to be applied
+		_my->m_rb->m_collisions.push_back(new Collision(cp, n, _other, _my));
+		return true;
+
+	}
+	return false;
+}
+
+bool Physics::sphereToBox(GameObject *_my, GameObject *_other, glm::vec3 _c1)
+{
+
+	if (Physics::sphereBoxOverlap(_my, _other))
+	{
+		if (_other->getTag() != "floor")
+		{
+			int r = 5;
+		}
+		glm::vec3 otherP = _other->getPosition();
+		glm::vec3 pos = _my->getPosition();
+		glm::vec3 length, oLength;
+
+		length = _my->m_sphere->getRadius() * _my->m_shapeComp->getSize(); //Should be 1, but just incase.
+
+
+		if (_other->isAdvancedPhysics() == false)
+		{
+			oLength = ((_other->m_shapeComp->getScale() / 2.0f) * _other->m_shapeComp->getSize());
+		}
+		else
+		{
+			oLength = ((_other->m_shapeComp->getScale() / 2.0f) * _other->m_shapeComp->getSize()) * _other->m_Phy->getRotMat(); //Experimental
+		}
+		std::vector<glm::vec3> oNormals;
+		oNormals.resize(6);
+		oNormals[0] = UP;
+		oNormals[1] = DOWN;
+		oNormals[2] = LEFT;
+		oNormals[3] = RIGHT; //Multiply by rotmat
+		oNormals[4] = FORWARDS;
+		oNormals[5] = BACKWARDS;
+		glm::vec3 rayToBox = pos - otherP;
+
+		float lowest = INFINITY;
+		int winFace;
+
+		for (int i = 0; i < 6; i++) // For each face
+		{
+			glm::vec3 pL = otherP + (oLength * oNormals[i]);
+			glm::vec3 sL = pos - (length * oNormals[i]);
+			float dToFace = fabs(Physics::distanceToPlane(oNormals[i], sL, pL));
+
+			if (dToFace < lowest) // Check which face most closely 'faces' us
+			{
+				lowest = dToFace;
+				winFace = i; //We can only have collided with the face that faces us. 
+			}
+		}
+		if (winFace == 4 || winFace == 5)
+		{
+			int r = 5;
+		}
+
+		glm::vec3 n = oNormals[winFace];
+
+		if (pos.z < otherP.z)
+		{
+			n.z = -n.z;
+		}
+		//The 'Z' axis is visually backwards
+
+		glm::vec3 expected = (otherP + (oLength * n) + (length * n));//Expected position in the normal
+		glm::vec3 dif = ((pos * n) - (expected * n)) * n;//Difference between ^ and actual position
+		glm::vec3 cp = pos - dif;//Aforementioned difference saved and ready to be applied
+
+		_my->m_rb->m_collisions.push_back(new Collision(cp, n, _other, _my)); //Create a collision
+		return true;
+	}
 	return false;
 }
 
@@ -323,7 +489,7 @@ glm::vec3 Physics::roundNormals(glm::vec3 _n)
 	return _n;
 }
 
-//Needs collision handling after checking
+//Works with physics
 bool Physics::boxToBox(GameObject *_my, GameObject* _other, glm::vec3 _c1)
 {
 	glm::vec3 otherP = _other->getPosition();
@@ -342,7 +508,7 @@ bool Physics::boxToBox(GameObject *_my, GameObject* _other, glm::vec3 _c1)
 	{
 		length = ((_my->m_shapeComp->getScale() / 2.0f) * _my->m_shapeComp->getSize()); // We factor size into the calculations on the off-chance it isn't 1. It should be 1 by default
 	}
-	else 
+	else
 	{
 		length = ((_my->m_shapeComp->getScale() / 2.0f) * _my->m_shapeComp->getSize()) * _my->m_Phy->getRotMat(); //Experimental
 	}
@@ -352,7 +518,7 @@ bool Physics::boxToBox(GameObject *_my, GameObject* _other, glm::vec3 _c1)
 		oLength = ((_other->m_shapeComp->getScale() / 2.0f) * _other->m_shapeComp->getSize());
 	}
 
-	else 
+	else
 	{
 		oLength = ((_other->m_shapeComp->getScale() / 2.0f) * _other->m_shapeComp->getSize()) * _other->m_Phy->getRotMat(); //Experimental
 	}
@@ -365,31 +531,35 @@ bool Physics::boxToBox(GameObject *_my, GameObject* _other, glm::vec3 _c1)
 			if (pos.z + length.z >= otherP.z - oLength.z && pos.z - length.z <= otherP.z + oLength.z)
 			{
 				glm::vec3 rayToBox = pos - otherP;
-				float lowest = 0.0f;
-				int winFace;
-				
-				if (_my->getTag() == "boxio2")
-				{
-					int r = 5;
-				}
 
+				float lowest = INFINITY;
+				int winFace;
 				for (int i = 0; i < 6; i++) // For each face
 				{
-					float directness = glm::dot(oNormals[i], -rayToBox);
-					if (directness < lowest) // Check which face most closely 'faces' us
+					glm::vec3 pL = otherP + (oLength * oNormals[i]);
+					glm::vec3 sL = pos - (length * oNormals[i]);
+					float dToFace = fabs(Physics::distanceToPlane(oNormals[i], sL, pL));
+
+					if (fabs(dToFace) < lowest) // Check which face most closely 'faces' us
 					{
-						lowest = directness;
-						winFace = i; //We must have collided with the face that faces us. 
+						lowest = dToFace;
+						winFace = i; //We can only have collided with the face that faces us. 
 					}
 				}
 				glm::vec3 n = oNormals[winFace];
-				glm::vec3 dif = otherP + (oLength * n) + (length * n);
-				dif = pos - dif;
-				dif = sqrt(dif * dif); // Ensure this is positive
-				dif *= n;
-				glm::vec3 cp = pos + dif;
-				_my->m_rb->setPermCP(cp);
-				
+				if (pos.z < otherP.z)
+				{
+					n.z = -n.z;
+				}
+				glm::vec3 expected = (otherP + (oLength * n) + (length * n));
+				glm::vec3 dif = ((pos * n) - (expected * n)) * n;
+				glm::vec3 cp = pos - dif;
+
+				if (n == glm::vec3(0.0f, 1.0f, 0.0f)) // We're on top of the box
+				{
+					_my->m_rb->setFloored(true);
+				}
+
 				_my->m_rb->m_collisions.push_back(new Collision(cp, n, _other, _my));
 				return true;
 				//Needs to find the normal, the CP and create the collision
@@ -404,6 +574,7 @@ bool Physics::boxToPlane(GameObject *_my, GameObject * _other, glm::vec3 _c1)
 {
 	glm::vec3 c0 = _my->getPosition();
 	glm::vec3 n = _other->m_plane->getNorm();
+	n = Physics::roundNormals(n);
 	glm::vec3 q = _other->getPosition();
 	glm::vec3 scale = _my->m_shapeComp->getScale();
 	glm::vec3 ci;
@@ -414,33 +585,45 @@ bool Physics::boxToPlane(GameObject *_my, GameObject * _other, glm::vec3 _c1)
 	float dEdge = glm::distance(edgePoint * n, c0 * n);
 	glm::vec3 pLength = _other->m_shapeComp->getScale() / 2.0f;
 
+	float a, b, c;
+	a = b = c = 0.0f;
+	a = 1.0f - fabs(n.x);
+	b = 1.0f - fabs(n.y);
+	c = 1.0f - fabs(n.z);
+	glm::vec3 invNormal = glm::vec3(a, b, c);
+	glm::vec3 aPos = c0 * invNormal;
+	glm::vec3 aLength = pLength * invNormal;
+	glm::vec3 amLength = (scale * invNormal) / 2.0f;
+	glm::vec3 aPpos = q * invNormal;
+
 	if (fabs(dis2Plane) <= dEdge) //If already colliding with the plane
 	{
 
-		if (fabs(c0.x - scale.x / 2.0f) > q.x + pLength.x || fabs(c0.z - scale.z / 2.0f) > q.z + pLength.z) // If we fall off the plane
+		if (fabs(aPos.x - amLength.x) > aPpos.x + aLength.x || fabs(aPos.y - amLength.y) > aPpos.y + aLength.y || fabs(aPos.z - amLength.z) > aPpos.z + aLength.z) // If we fall off the plane
 		{
 			return false;
-		} 
+		}
 
 		if (permCP == glm::vec3(0.0f, 0.0f, 0.0f))
 		{
-			permCP = q + dEdge * n;
+			permCP = q + (dEdge - 0.01f) * n;
 		}
 
 		glm::vec3 dif = c0 - permCP;
 		dif *= n;
 		ci = c0 - dif;
+		_my->m_rb->setFloored(true);
 		_my->m_rb->m_collisions.push_back(new Collision(ci, n, _other, _my));
-
-		return true;
 	}
+	return true;
+
 
 	if (fabs(dis2Plane) > dEdge && fabs(dis2Plane2) < dEdge) //If colliding with the plane during movement between two timesteps
 	{
-		if (fabs(c0.x - scale.x / 2.0f) > q.x + pLength.x || fabs(c0.z - scale.z / 2.0f) > q.z + pLength.z) // If we fall off the plane
+		if (fabs(aPos.x - amLength.x) > aPpos.x + aLength.x || fabs(aPos.y - amLength.y) > aPpos.y + aLength.y || fabs(aPos.z - amLength.z) > aPpos.z + aLength.z) // If we fall off the plane
 		{
 			return false;
-		} 
+		}
 
 		float t = (dis2Plane - dEdge) / (dis2Plane - dis2Plane2);
 		ci = (1.0f - t) * c0 + t * _c1;
@@ -450,16 +633,17 @@ bool Physics::boxToPlane(GameObject *_my, GameObject * _other, glm::vec3 _c1)
 		}
 		_my->m_rb->setPermCP(ci);
 		_my->m_rb->m_collisions.push_back(new Collision(ci, n, _other, _my));
+		_my->m_rb->setFloored(true);
 		return true;
 	}
 	return false;
 }
 
-//Works, although buggy. DOES NOT WORK WITH 2D PLANES.
+//Works, although buggy. DOES NOT WORK WITH 2D PLANES. (But is more than happy with an infinitely thin box)
 bool Physics::meshToMesh(GameObject *_my, GameObject * _other, glm::vec3 _c1)
 {
-	
-	if (_other->getShape() == "sphere")
+
+	if (_other->getShape() == "sphere") // Too many polygons. Not worth it
 	{
 		return false;
 	}
@@ -467,19 +651,26 @@ bool Physics::meshToMesh(GameObject *_my, GameObject * _other, glm::vec3 _c1)
 	glm::vec3 otherP = _other->getPosition();
 	glm::vec3 pos = _my->getPosition();
 	glm::vec3 length = ((_my->m_shapeComp->getScale() / 2.0f) * _my->m_shapeComp->getSize()); // We factor size into the calculations because meshes use the same collision function
-	glm::vec3 oLength = ((_other->m_shapeComp->getScale() / 2.0f) * (_other->m_shapeComp->getSize())); 
+	glm::vec3 oLength = ((_other->m_shapeComp->getScale() / 2.0f) * (_other->m_shapeComp->getSize()));
 
-	
+
 
 	if (pos.x + length.x >= otherP.x - oLength.x && pos.x - length.x <= otherP.x + oLength.x)
 	{
-		if (pos.y + length.y >= otherP.y - oLength.y && pos.y - length.y <= otherP.y + oLength.y)
+		if (pos.y + length.y >= otherP.y - oLength.y && pos.y - length.y <= otherP.y + oLength.y) //Spatial partitioning using AABB
 		{
 			if (pos.z + length.z >= otherP.z - oLength.z && pos.z - length.z <= otherP.z + oLength.z)
 			{
-				
+				if (_other->getShape() == "mesh" &&_other->m_mesh->isEasy()) //If a mesh is 'easy' 
+				{
+					if (fabs(glm::distance(_my->getPosition(), _other->getPosition()) <= _other->m_shapeComp->getScale().y * _other->m_shapeComp->getSize().y)) //Treat as a sphere 
+					{
+						return true;
+					}
+					else { return false; }
+				}
 
-				int r = 5;
+
 				// Their hitboxes overlap, now test the actual triangle affected
 				VertexBuffer *otherTriPos = _other->m_shapeComp->m_vAO->getTriPos();
 				VertexBuffer *myTriPos = _my->m_shapeComp->m_vAO->getTriPos();
@@ -488,10 +679,12 @@ bool Physics::meshToMesh(GameObject *_my, GameObject * _other, glm::vec3 _c1)
 				glm::vec3 cN;
 				glm::vec3 cP;
 				bool collideMesh = false;
-
+				glm::vec3 offset = glm::vec3(0.0f);
 				int collideEarly = 0;
-				if (_other->getTag() == _my->m_rb->getLastCol() && _my->m_rb->colBefore()) // If we're colliding with the same mesh as our last collision, check for an 'early exit'.
+
+				if (_my->isPhysics() && _other->getTag() == _my->m_rb->getLastCol() && _my->m_rb->colBefore()) // If we're colliding with the same mesh as our last collision, check for an 'early exit'.
 				{
+					//If the same two triangles as last time collide, we can skip checking them all
 					std::vector<int> otherLtri = _my->m_rb->getColTri();
 					float eo1 = otherTriPos->getData(otherLtri[0]);
 					float eo2 = otherTriPos->getData(otherLtri[1]);
@@ -541,18 +734,61 @@ bool Physics::meshToMesh(GameObject *_my, GameObject * _other, glm::vec3 _c1)
 					float eE2[3] = { vE2.x, vE2.y, vE2.z };
 
 					vE3 = myModel * vE3;
-					float eE3[3] = { vE3.x, vE3.y, vE3.z };						
+					float eE3[3] = { vE3.x, vE3.y, vE3.z };
 
+					collideEarly = Physics::NoDivTriTriIsect(eE1, eE2, eE3, eEo1, eEo2, eEo3); //Compare the last two known triangles to see if they're still colliding
+					if (collideEarly)
 					{
-						collideEarly = Physics::NoDivTriTriIsect(eE1, eE2, eE3, eEo1, eEo2, eEo3); //Compare the last two known triangles to see if they're still colliding
+						float normal[3] = { cN.x, cN.y, cN.z };
+						int steps = -1;			//This is -1 because we want to use number of steps -1 as the final multiply value.	
+						float precision = _my->m_rb->getPrecision();
+						while (Physics::NoDivTriTriIsect(eE1, eE2, eE3, eEo1, eEo2, eEo3)) // Keep moving until we don't collide
+						{
+							steps++;
+							for (int v = 0; v < 3; v++)
+							{
+								eE1[v] += precision * normal[v]; // Move all of the points 'precision' distance away in the 'normal' direction
+							}
+							for (int v = 0; v < 3; v++)
+							{
+								eE2[v] += precision * normal[v];
+							}
+							for (int v = 0; v < 3; v++)
+							{
+								eE3[v] += precision * normal[v];
+							}
+							if (steps > 2000)
+							{
+								steps = 2000;
+								break;
+							} //Avoid un-ending loops because the object can't budge for some reason
+						}
+						offset += (precision * steps) * cN;
+
+						if (cN == glm::vec3(0.0f, 1.0f, 0.0f)) // We're currently on and colliding with a floor
+						{
+							_my->m_rb->setFloored(true); //Saves so much effort
+						}
+
+						if (_my->m_rb->isFloored() && offset.y < 0.0f) // If we're on a floor, stay on it.
+						{
+							offset.y = 0.0f;
+						}
+						if (_other->getTag() != "floor")
+						{
+							int r = 5;
+						}						
+						
+						cP = _my->getPosition() + offset;  // Set the CP to the last place we collided at.
+						
+						_my->m_rb->m_collisions.push_back(new Collision(cP, cN, _other, _my));
+						return true;
 					}
-					
-					//This means if we're moving AWAY from the normal of the triangle, it won't check for early collision
 				}
 
-				if (collideEarly == false)
+				if (collideEarly == false) //We didn't collide early, time to check them all
 				{
-					
+
 					int partition1 = 9;
 					if (otherTriPos->getDataSize() > 1500)
 					{
@@ -573,13 +809,11 @@ bool Physics::meshToMesh(GameObject *_my, GameObject * _other, glm::vec3 _c1)
 					{
 						partition1 *= 2;
 					}
-					if (otherTriPos->getDataSize() > 24000)
+					if (otherTriPos->getDataSize() > 24000) //If it's a big polygon, we can check 1 in every x triangles
 					{
 						partition1 *= 2;
 					}
-
-
-					glm::vec3 offset = glm::vec3(0.0f);
+					
 					for (int o = 0; o < otherTriPos->getDataSize() - partition1; o += partition1)
 					{
 
@@ -615,12 +849,6 @@ bool Physics::meshToMesh(GameObject *_my, GameObject * _other, glm::vec3 _c1)
 						p3 = glm::vec3(u3[0], u3[1], u3[2]);
 						cN = glm::normalize(glm::cross(p2 - p1, p3 - p1));
 
-						if (_other->getTag() == "w")
-						{
-							int r = 5;
-							OUTPUT(cN);
-							std::cout << "hitwall";
-						}
 
 						float a = (u1[0] + u2[0] + u3[0]) / 3.0f;
 						float b = (u1[1] + u2[1] + u3[1]) / 3.0f;
@@ -647,7 +875,7 @@ bool Physics::meshToMesh(GameObject *_my, GameObject * _other, glm::vec3 _c1)
 							partition2 *= 2;
 						}
 
-						
+
 						for (int l = 0; l < myTriPos->getDataSize() - partition2; l += partition2)
 						{
 
@@ -669,18 +897,18 @@ bool Physics::meshToMesh(GameObject *_my, GameObject * _other, glm::vec3 _c1)
 							glm::vec4 vV3 = glm::vec4(v3x, v3y, v3z, 1.0f);
 
 							vV1 = myModel * vV1;
-							vV1 += glm::vec4(offset, 0.0f);
+							//vV1 += glm::vec4(offset, 0.0f);
 							float v1[3] = { vV1.x, vV1.y, vV1.z };
 
 							vV2 = myModel * vV2;
-							vV2 += glm::vec4(offset, 0.0f);
+							//vV2 += glm::vec4(offset, 0.0f);
 							float v2[3] = { vV2.x, vV2.y, vV2.z };
 
 							vV3 = myModel * vV3;
-							vV3 += glm::vec4(offset, 0.0f);
+							//vV3 += glm::vec4(offset, 0.0f);
 							float v3[3] = { vV3.x, vV3.y, vV3.z };
 
-							
+
 							cN = Physics::roundNormals(cN);
 							int collideTri = 0;
 							glm::vec3 rayToTri = _my->getPosition() - triLoc; //Cast a ray from position to the location of the triangle
@@ -692,7 +920,6 @@ bool Physics::meshToMesh(GameObject *_my, GameObject * _other, glm::vec3 _c1)
 
 							if (collideTri)
 							{
-								
 								std::vector<int> colTri; // Store the data positions of the two colliding triangles for faster re-checking later
 								colTri.resize(9);
 								for (int t = 0; t < 9; t++)
@@ -700,22 +927,26 @@ bool Physics::meshToMesh(GameObject *_my, GameObject * _other, glm::vec3 _c1)
 									colTri[t] = o + t;
 								}
 								std::vector<int> myTri;
-								myTri.resize(9);								
+								myTri.resize(9);
 								for (int t = 0; t < 9; t++)
 								{
 									myTri[t] = l + t;
 								}
-								_my->m_rb->setColTri(colTri);
-								_my->m_rb->setMyTri(myTri);
-
+								if (_my->isPhysics())
+								{
+									_my->m_rb->setColTri(colTri);
+									_my->m_rb->setMyTri(myTri);
+								}
 								float normal[3] = { cN.x, cN.y, cN.z };
-
 								int steps = -1;			//This is -1 because we want to use number of steps -1 as the final multiply value.	
-								float precision = _my->m_rb->getPrecision();
+								float precision;
+								if (!_my->isPhysics()) { precision = 0.01f; }
+								else { precision = _my->m_rb->getPrecision(); }
+								
 								while (Physics::NoDivTriTriIsect(v1, v2, v3, u1, u2, u3)) // Keep moving until we don't collide
 								{
 									steps++;
-									for (int v = 0; v < 3; v++) 
+									for (int v = 0; v < 3; v++)
 									{
 										v1[v] += precision * normal[v]; // Move all of the points 'precision' distance away in the 'normal' direction
 									}
@@ -727,65 +958,188 @@ bool Physics::meshToMesh(GameObject *_my, GameObject * _other, glm::vec3 _c1)
 									{
 										v3[v] += precision * normal[v];
 									}
-									if (steps > 2000) 
-									{ 
+									if (steps > 2000)
+									{
 										steps = 2000;
-										break; 
+										break;
 									} //Avoid un-ending loops because the object can't budge for some reason
 								}
+
+
+								if (cN == glm::vec3(0.0f, 1.0f, 0.0f) && _my->isPhysics()) // We're currently on and colliding with a floor
+								{
+									_my->m_rb->setFloored(true); //Saves so much effort
+								}
 								
-								
+
 								offset += (precision * steps) * cN;
-
-								
-
-								if (cN == glm::vec3(0.0f, 1.0f, 0.0f)) // We're currently on and colliding with a floor
+								if (_my->isPhysics())
 								{
-									if (_other->getTag() == "w") //No, that's a wall. You aren't supposed to walk through that.
+									if (_my->m_rb->isFloored() && offset.y < 0.0f) // If we're on a floor, stay on it.
 									{
-										offset.z += 3.0f;
+										offset.y = 0.0f;
 									}
-									_my->m_rb->setFloored(true);
 								}
-								if (_my->m_rb->isFloored()) // If we're on a floor, stay on it.
-								{
-									offset.y = 0.0f;
-									//std::cout << "Floored";
-								}
-								cP = _my->getPosition() + offset;  // Set the CP to the last place we collided at.
+								collideMesh = true;
+							}							
+						}	
+
+						if (collideMesh)
+						{
+							cP = _my->getPosition() + offset;  // Set the CP to the last place we collided at.
+							if (_my->isPhysics())
+							{
 								_my->m_rb->setColBefore(true);
 								_my->m_rb->setLastCol(_other->getTag());
-								collideMesh = true;
-								break;
+								
+								_my->m_rb->m_collisions.push_back(new Collision(cP, cN, _other, _my));
 							}
+							else _my->setPosition(cP);
+							return true;
 						}
-						if (collideMesh) { break; }
-					}
-					if (collideMesh)
-					{
-						_my->m_rb->m_collisions.push_back(new Collision(cP, cN, _other, _my));
-						return true;
-					}
-				}
-
-				else // We collided early
-				{					
-					glm::vec3 cP = _my->getPosition();
-					if (cN == glm::vec3(0.0f, 1.0f, 0.0f)) // We're on a floor
-					{
-						_my->m_rb->setFloored(true);
-					}				
-					
-					_my->m_rb->m_collisions.push_back(new Collision(cP, cN, _other, _my));
-					
-					return true;
-				}
+					}					
+				}				
 			}
 			else { return false; }
 		}
 		else { return false; }
 	}
 	else { return false; }
+}
+
+bool Physics::sphereBoxOverlap(GameObject* _sphere, GameObject *_box) //https://studiofreya.com/3d-math-and-physics/sphere-vs-aabb-collision-detection-test/
+{
+	float dSq = 0.0f;
+	glm::vec3 pos = _sphere->getPosition();
+	glm::vec3 bPos = _box->getPosition();
+	glm::vec3 length = _box->m_shapeComp->getScale() / 2.0f;
+
+	if (pos.x < bPos.x - length.x)
+	{
+		dSq += pow((bPos.x - length.x) - pos.x, 2.0f);
+	}
+	else if (pos.x > bPos.x + length.x)
+	{
+		dSq += pow(pos.x - (bPos.x + length.x), 2.0f);
+	}
+
+	if (pos.y < bPos.y - length.y)
+	{
+		dSq += pow((bPos.y - length.y) - pos.y, 2.0f);
+	}
+	else if (pos.y > bPos.y + length.y)
+	{
+		dSq += pow(pos.y - (bPos.y + length.y), 2.0f);
+	}
+
+	if (pos.z < bPos.z - length.z)
+	{
+		dSq += pow((bPos.z - length.z) - pos.z, 2.0f);
+	}
+	else if (pos.z > bPos.z + length.z)
+	{
+		dSq += pow(pos.z - (bPos.z + length.z), 2.0f);
+	}
+
+	if (dSq <= pow(_sphere->m_sphere->getRadius(), 2.0f))
+	{
+		return true;
+	}
+	else { return false; }
+}
+
+RayCollision* Physics::rayToTri(std::vector<GameObject*> _obj, glm::vec3 _rayDir, glm::vec3 _origin, std::string _rayTag)
+{
+	GameObject* winObject = nullptr;
+	glm::vec3 triLoc = glm::vec3(1000.0f, 1000.0f, 1000.0f); //Random big starting number
+	glm::vec3 winTri; //The triangle we hit's position
+	float shortest = 1000.0f; //Closest triangle
+	bool collideMesh = false;
+	VertexBuffer *otherTriPos;
+	glm::mat4 oModel;
+
+	for (int i = 0; i < _obj.size(); i++)
+	{
+		otherTriPos = _obj[i]->m_shapeComp->m_vAO->getTriPos();	
+		oModel = _obj[i]->m_shapeComp->getModel();
+		glm::vec3 tN;
+		
+		double* t = new double(0.0);
+		double* u = new double(0.0);
+		double* v = new double(0.0);
+
+		for (int o = 0; o < otherTriPos->getDataSize() - 9; o += 9)
+		{
+
+			float u1x = otherTriPos->getData(o);
+			float u1y = otherTriPos->getData(o + 1);
+			float u1z = otherTriPos->getData(o + 2);
+
+			float u2x = otherTriPos->getData(o + 3);
+			float u2y = otherTriPos->getData(o + 4);
+			float u2z = otherTriPos->getData(o + 5);
+
+			float u3x = otherTriPos->getData(o + 6);
+			float u3y = otherTriPos->getData(o + 7);
+			float u3z = otherTriPos->getData(o + 8);
+
+
+			glm::vec4 vU1 = glm::vec4(u1x, u1y, u1z, 1.0f);
+			glm::vec4 vU2 = glm::vec4(u2x, u2y, u2z, 1.0f);
+			glm::vec4 vU3 = glm::vec4(u3x, u3y, u3z, 1.0f);
+
+			vU1 = oModel * vU1;
+			double u1[3] = { vU1.x, vU1.y, vU1.z };
+
+			vU2 = oModel * vU2;
+			double u2[3] = { vU2.x, vU2.y, vU2.z };
+
+			vU3 = oModel * vU3;
+			double u3[3] = { vU3.x, vU3.y, vU3.z };
+
+			glm::vec3 p1, p2, p3;
+			p1 = glm::vec3(u1[0], u1[1], u1[2]);
+			p2 = glm::vec3(u2[0], u2[1], u2[2]);
+			p3 = glm::vec3(u3[0], u3[1], u3[2]);
+			tN = glm::normalize(glm::cross(p2 - p1, p3 - p1));
+
+
+			float a = (u1[0] + u2[0] + u3[0]) / 3.0f;
+			float b = (u1[1] + u2[1] + u3[1]) / 3.0f;
+			float c = (u1[2] + u2[2] + u3[2]) / 3.0f;
+			double orig[3] = { _origin.x, _origin.y, _origin.z };
+			double dir[3] = { _rayDir.x, _rayDir.y, _rayDir.z };
+			triLoc = glm::vec3(a, b, c);
+			glm::vec3 rayToTri = glm::normalize(triLoc - _origin);
+
+			if (glm::dot(-rayToTri, _rayDir) < 0.0f - 0.0001f) //refuse to register collision with a triangle that we're not looking at
+			{
+				if (Physics::intersect_triangle3(orig, dir, u1, u2, u3, t, u, v))
+				{
+					collideMesh = true;
+					float distance = fabs(glm::distance(_origin, triLoc));
+					if (distance < shortest)
+					{
+						shortest = distance;
+						winObject = _obj[i];
+						winTri = triLoc;
+						break;
+					}
+				}
+			}
+		}
+	}
+	RayCollision* col = new RayCollision;
+	col->m_hit = collideMesh;
+	if (collideMesh)
+	{
+		col->m_hitObj = winObject;
+		col->m_rayDir = _rayDir;
+		col->m_origin = _origin;
+		col->m_rayTag = _rayTag;
+		col->m_hitPoint = winTri;
+	}
+	return col;
 }
 
 
@@ -832,7 +1186,7 @@ else no check is done (which is less robust)
             dest[1]=v1[1]-v2[1]; \
             dest[2]=v1[2]-v2[2];}
 
-	/* sort so that a<=b */
+/* sort so that a<=b */
 #define SORT(a,b)       \
              if(a>b)    \
              {          \
@@ -843,9 +1197,9 @@ else no check is done (which is less robust)
              }
 
 
-	/* this edge to edge test is based on Franlin Antonio's gem:
-	"Faster Line Segment Intersection", in Graphics Gems III,
-	pp. 199-202 */
+/* this edge to edge test is based on Franlin Antonio's gem:
+"Faster Line Segment Intersection", in Graphics Gems III,
+pp. 199-202 */
 #define EDGE_EDGE_TEST(V0,U0,U1)                      \
   Bx=U0[i0]-U1[i0];                                   \
   By=U0[i1]-U1[i1];                                   \
@@ -988,8 +1342,6 @@ int Physics::coplanar_tri_tri(float N[3], float V0[3], float V1[3], float V2[3],
         } \
 }
 
-
-
 int Physics::NoDivTriTriIsect(float V0[3], float V1[3], float V2[3],
 	float U0[3], float U1[3], float U2[3])
 {
@@ -1101,7 +1453,63 @@ int Physics::NoDivTriTriIsect(float V0[3], float V1[3], float V2[3],
 }
 
 
+/********************************************************/
+/* ray-triangle overlap test code                      */
+/* by Tomas Akenine-Möller                              */
+/********************************************************/
+int Physics::intersect_triangle3(double orig[3], double dir[3], double vert0[3], double vert1[3], double vert2[3], double * t, double * u, double * v)
+{
+	double edge1[3], edge2[3], tvec[3], pvec[3], qvec[3];
+	double det, inv_det;
 
+	/* find vectors for two edges sharing vert0 */
+	SUB(edge1, vert1, vert0);
+	SUB(edge2, vert2, vert0);
+
+	/* begin calculating determinant - also used to calculate U parameter */
+	CROSS(pvec, dir, edge2);
+
+	/* if determinant is near zero, ray lies in plane of triangle */
+	det = DOT(edge1, pvec);
+
+	/* calculate distance from vert0 to ray origin */
+	SUB(tvec, orig, vert0);
+	inv_det = 1.0 / det;
+
+	CROSS(qvec, tvec, edge1);
+
+	if (det > EPSILON)
+	{
+		*u = DOT(tvec, pvec);
+		if (*u < 0.0 || *u > det)
+			return 0;
+
+		/* calculate V parameter and test bounds */
+		*v = DOT(dir, qvec);
+		if (*v < 0.0 || *u + *v > det)
+			return 0;
+
+	}
+	else if (det < -EPSILON)
+	{
+		/* calculate U parameter and test bounds */
+		*u = DOT(tvec, pvec);
+		if (*u > 0.0 || *u < det)
+			return 0;
+
+		/* calculate V parameter and test bounds */
+		*v = DOT(dir, qvec);
+		if (*v > 0.0 || *u + *v < det)
+			return 0;
+	}
+	else return 0;  /* ray is parallell to the plane of the triangle */
+
+	*t = DOT(edge2, qvec) * inv_det;
+	(*u) *= inv_det;
+	(*v) *= inv_det;
+
+	return 1;
+}
 
 /********************************************************/
 /* AABB-triangle overlap test code                      */
@@ -1237,8 +1645,8 @@ int Physics::triBoxOverlap(float boxcenter[3], float boxhalfsize[3], float trive
 	SUB(e1, v2, v1);      /* tri edge 1 */
 	SUB(e2, v0, v2);      /* tri edge 2 */
 
-	/* Bullet 3:  */
-	/*  test the 9 tests first (this was faster) */
+						  /* Bullet 3:  */
+						  /*  test the 9 tests first (this was faster) */
 	fex = fabs(e0[X]);
 	fey = fabs(e0[Y]);
 	fez = fabs(e0[Z]);

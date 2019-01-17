@@ -100,7 +100,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -168,16 +168,14 @@
     <ClInclude Include="VertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="..\shaders\invFrag.txt" />
     <Text Include="..\shaders\lightFrag.txt" />
     <Text Include="..\shaders\lightVert.txt" />
+    <Text Include="..\shaders\monsterFrag.txt" />
     <Text Include="..\shaders\simpleFrag.txt" />
     <Text Include="..\shaders\simpleVert.txt" />
     <Text Include="..\shaders\UI Frag.txt" />
     <Text Include="..\shaders\UI Vert.txt" />
-    <Text Include="Listtxt.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\Capture.JPG" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

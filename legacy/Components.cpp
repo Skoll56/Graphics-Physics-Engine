@@ -134,7 +134,7 @@ Plane::Plane(std::string _texName, glm::vec3 _scale, glm::vec3 _normal)
 	m_tex = new Texture();
 	m_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 	m_scale = _scale;
-	m_tex->addTexture(_texName);
+	
 	m_size = glm::vec3(1.0f, 1.0f, 1.0f);
 	m_mass = INFINITY;
 	m_solid = true;
@@ -160,7 +160,7 @@ Sphere::Sphere(std::string _texName, float _radius)
 	m_tex = new Texture();
 	m_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 	m_scale = glm::vec3(_radius, _radius, _radius);
-	m_tex->addTexture(_texName);
+	//m_tex->addTexture(_texName);
 	m_size = glm::vec3(1.0f, 1.0f, 1.0f);
 	m_mass = INFINITY;
 	m_solid = true;
@@ -173,13 +173,13 @@ Sphere::Sphere(std::string _texName, float _radius)
 
 Mesh::Mesh(std::string _texName, std::string _obj, glm::vec3 _scale, glm::vec3 _size)
 {
+	m_easyCollide = false;
 	m_vBOp = new VertexBuffer();
 	m_vBOt = new VertexBuffer();
 	m_vAO = new VertexArray();
 	m_tex = new Texture();
 	m_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 	m_scale = _scale;
-	m_tex->addTexture(_texName);
 	m_size = _size;
 	m_mass = INFINITY;
 	m_solid = true;
@@ -190,3 +190,35 @@ Mesh::Mesh(std::string _texName, std::string _obj, glm::vec3 _scale, glm::vec3 _
 	m_semiMesh = false;
 }
 
+Mesh::Mesh(std::string _texName,  glm::vec3 _scale)
+{
+
+	m_easyCollide = false;
+	
+	m_vBOp = new VertexBuffer();	
+	m_vAO = new VertexArray();
+	
+	m_vBOp->add(glm::vec3(0.0f, 1.0f, 0.0f));
+	m_vBOp->add(glm::vec3(-1.0f, -1.0f, 0.0f));
+	m_vBOp->add(glm::vec3(1.0f, -1.0f, 0.0f));	
+	m_vAO->setBuffer("in_Position", m_vBOp);	
+	
+	m_vBOt = new VertexBuffer();	
+	m_tex = new Texture();
+	m_vBOt->add(glm::vec2(0.5f, 0.0f));
+	m_vBOt->add(glm::vec2(0.0f, 1.0f));
+	m_vBOt->add(glm::vec2(1.0f, 1.0f));		
+	m_vAO->setBuffer("in_TexCoord", m_vBOt);
+	
+	
+	
+	m_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+	m_scale = _scale;	
+	m_mass = INFINITY;
+	m_solid = true;
+	
+	m_tex->addTexture(_texName);
+	m_friction = 1.0f;
+	m_shininess = 1;
+	m_semiMesh = false;
+}

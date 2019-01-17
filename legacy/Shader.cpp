@@ -284,16 +284,7 @@ void Shader::setUniform(std::string _uniform, Texture *_tex)
 	glUseProgram(0);
 }
 
-/*void Shader::setUniform(std::string _uniform, int _value)
-{
-	GLint uniformId = glGetUniformLocation(m_id, _uniform.c_str());
-	if (uniformId == -1) { throw std::exception(); }
 
-
-	glUseProgram(m_id);
-	glUniform1i(uniformId, _value);
-	glUseProgram(0);
-} */
 
 GLuint Shader::getId()
 {

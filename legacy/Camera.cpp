@@ -12,7 +12,7 @@ Camera::Camera(glm::vec3 _startPos)
 	m_yaw = 90.0f;
 	m_pitch = 0.0f;
 	m_speed = 15.0f;
-	m_rotSpeed = 2.0f;
+	m_rotSpeed = 12.0f;
 }
 
 Camera::~Camera()
@@ -22,25 +22,9 @@ Camera::~Camera()
 
 void Camera::update(float _dTime, Input *_input)
 {
-	if (_input->m_r1)
-	{
-		m_yaw += m_rotSpeed;
-	}
-
-	if (_input->m_r2)
-	{
-		m_yaw -= m_rotSpeed;
-	}
-
-	if (_input->m_r)
-	{
-		m_pitch += m_rotSpeed;
-	}
-
-	if (_input->m_f)
-	{
-		m_pitch -= m_rotSpeed;
-	}
+	
+	m_yaw += _input->m_xOffset * m_rotSpeed * _dTime;
+	m_pitch -= _input->m_yOffset * m_rotSpeed * _dTime;
 
 	if (m_pitch > 89.0f) { m_pitch = 89.0f; }
 	else if (m_pitch < -89.0f) { m_pitch = -89.0f; }

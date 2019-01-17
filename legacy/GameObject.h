@@ -36,8 +36,11 @@ public:
 	void addBoxShape(std::string _texName, glm::vec3 _scale);    
 	void addSphereShape(std::string _texName, float _radius);
 	void addMeshShape(std::string _texName, std::string _obj, glm::vec3 _scale, glm::vec3 _size, std::string _tag);
+	void addMeshShape(std::string _texName, glm::vec3 _scale, std::string _tag);
 	void deleteShape();
+	void addStats(float _hp, float _dmg, float _speed);
 
+	bool hasStats() { return m_stats; }
 	void addPhysics(std::string _tag, float _mass, float _bounciness); // Adds a rigidbody
 	void addAdvancedPhysics(std::string _shape, glm::vec3 _scale, float _mass); //Adds rotational-physics
 	void removePhysics();
@@ -47,6 +50,11 @@ public:
 	void setShapeString(std::string _val) { m_shape = _val; }
 	void setPhysBool(bool _val) { m_physics = _val; }
 	void setAdPhysBool(bool _val) { m_advancedPhys = _val; }
+	void setRoom(int _num) { m_roomNum = _num; }
+	int getRoomNum() { return m_roomNum; }
+	void setDelete(bool _val) { m_delete = _val; }
+	bool getDelete() { return m_delete; }
+	void setStats(bool _val) { m_stats = _val; }
 
 	//Component variables
 	PhysicsObj *m_rb;
@@ -56,17 +64,20 @@ public:
 	Mesh *m_mesh;
 	Shape *m_shapeComp;
 	AdvancedPhysics *m_Phy;
+	Stats *m_charSheet;
 
 protected:		
 	Shader *m_shader;
 	glm::vec3 m_position;	
 	std::string m_tag;	
 	bool m_active;
-
+	int m_roomNum;
+	bool m_delete;
 	//Component Variables
 	std::string m_shape;	
 	bool m_physics;	
 	bool m_advancedPhys;
+	bool m_stats;
 };
 
 #endif

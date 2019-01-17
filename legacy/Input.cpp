@@ -14,6 +14,7 @@ Input::Input()
 	m_r2 = false;
 	m_r = false;
 	m_f = false;
+	m_restart = false;
 };
 
 bool Input::takeInput(SDL_Event &_event) // The input handler / controller
@@ -29,10 +30,21 @@ bool Input::takeInput(SDL_Event &_event) // The input handler / controller
 
 		else if (_event.type == SDL_KEYDOWN)
 		{
+			if (_event.key.keysym.sym == SDLK_ESCAPE)
+			{
+				quit = true;
+			}
+
 			if (_event.key.keysym.sym == SDLK_a)
 			{
 				m_left = true;
 			}
+
+			if (_event.key.keysym.sym == SDLK_p)
+			{
+				m_restart = true;
+			}
+
 			if (_event.key.keysym.sym == SDLK_d)
 			{
 				m_right = true;
@@ -58,11 +70,11 @@ bool Input::takeInput(SDL_Event &_event) // The input handler / controller
 
 			if (_event.key.keysym.sym == SDLK_q)
 			{
-				m_r2 = true;
+				m_r2 = true; //Key Q
 			}
 			if (_event.key.keysym.sym == SDLK_e)
 			{
-				m_r1 = true;
+				m_r1 = true; //Key E
 			}
 			if (_event.key.keysym.sym == SDLK_r)
 			{
@@ -119,6 +131,8 @@ bool Input::takeInput(SDL_Event &_event) // The input handler / controller
 				m_f = false;
 			}
 		}
+
+		
 	}
 
 	return quit;

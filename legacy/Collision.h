@@ -1,6 +1,6 @@
 #ifndef _COLLISION_H_
 #define _COLLISION_H_
-
+#include <string>
 
 class GameObject;
 
@@ -20,6 +20,16 @@ public:
 	float m_massCalc;
 	glm::vec3 m_deltaVel; // The change in velocity this object will have
 	bool m_constCol;
+};
+
+struct RayCollision //A struct that holds needed data when acting on a raycast
+{
+	GameObject* m_hitObj;
+	glm::vec3 m_rayDir;
+	glm::vec3 m_origin;
+	std::string m_rayTag;
+	glm::vec3 m_hitPoint;
+	bool m_hit;
 };
 
 #endif

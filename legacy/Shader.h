@@ -25,7 +25,7 @@ public:
 	//Shader();
 	Shader(std::string _vert, std::string _frag);
 	void draw(VertexArray *vertexArray);
-	void printShaderInfoLog(GLuint obj); //Reference K-dog
+	void printShaderInfoLog(GLuint obj); //Reference Karsten
 	void setUniform(std::string _uniform, glm::vec4 _value);
 	void setUniform(std::string _uniform, float _value);
 	void setUniform(std::string _uniform, int _value);

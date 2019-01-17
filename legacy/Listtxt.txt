@@ -2,32 +2,39 @@
 
 To DO LIST
 
-Graphics:
+Graphics Core:
 Fix Collisions with walls [X]
-Make FlashLight []
-Make Enemy/Player entities []
-Make the self-building rooms []
-Make the Lovecraftian shader []
-Shadows ? []
-Fist working []
-Gun working []
-UI []
+Make FlashLight [X] ONLY IN RELEASE MODE 
+Make Enemy/Player entities [X]
+
+Make the Lovecraftian shader [X] 
+Bloodsplatter[X]
 Blotch [X]
+Make a hitbox above player for hornets [X]
+Make non-collider entities that collide but ignore phyics [X]
+Make screen overlay [X]
+Mouse controlled camera [X]
+Hornet shader [X]
+
+
+
+If I get time:
+Make the self-building rooms [] <
+UI []
+Gun working [X]
+Shadows ? []
 Dynamically introduce lights []
-
-
-Physics:
-Add txt maploading [] W
-Add real friction [] W
-Box:Box collisions [?] <-- Needs 'floored' precision to not fall through the floor
-Converting box collision boxes after rotation [?] <-- Needs testing
-Box:Plane collisions []
-Fix torque using Quats [X]
-Sphere:box collision[]
-
+Render Texturing []
+Sharpening and other misc effects []
+Over-the-shoulder cam[]
 
 
 Engine:
 Make a room-build function [X]
 Add corridor building with a door []
-Fix collisions in corners [] W or K
+Fix collisions in corners [X]
+
+Misc:
+References[]
+Code []
+Get non-stolen textures and objs []
